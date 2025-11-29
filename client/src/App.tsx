@@ -31,6 +31,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Profile from "@/pages/Profile";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminProducts from "@/pages/AdminProducts";
 import AdminOrders from "@/pages/AdminOrders";
 import AdminPromotions from "@/pages/AdminPromotions";
@@ -63,7 +64,6 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
-      <Route path="/profile" component={Profile} />
       <Route path="/live" component={Live} />
       <Route path="/shop" component={Home} />
       <Route path="/wishlist" component={Wishlist} />
@@ -72,8 +72,11 @@ function Router() {
       <Route path="/referral" component={ReferralProgram} />
       <Route path="/loyalty" component={LoyaltyProgram} />
       <Route path="/cart" component={Cart} />
-      <Route path="/checkout" component={Checkout} />
-      <Route path="/orders" component={OrderHistory} />
+
+      {/* Protected Routes (Login Required) */}
+      <Route path="/profile" component={(props: any) => <ProtectedRoute component={Profile} {...props} />} />
+      <Route path="/checkout" component={(props: any) => <ProtectedRoute component={Checkout} {...props} />} />
+      <Route path="/orders" component={(props: any) => <ProtectedRoute component={OrderHistory} {...props} />} />
       <Route path="/product/:id" component={ProductDetail} />
       <Route component={NotFound} />
     </Switch>

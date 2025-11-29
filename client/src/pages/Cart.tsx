@@ -1,11 +1,14 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Trash2, Plus, Minus, ShoppingCart } from "lucide-react";
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity } = useCart();
+  const { user } = useAuth();
+  const [, setLocation] = useLocation();
 
   if (cart.length === 0) {
     return (
@@ -136,11 +139,21 @@ export default function Cart() {
                   <span className="text-primary">₱{(subtotal + Math.round(tax)).toLocaleString()}</span>
                 </div>
 
-                <Link href="/checkout">
-                  <Button className="w-full rounded-full h-12 text-base" size="lg">
-                    Proceed to Checkout
+                {user ? (
+                  <Link href="/checkout">
+                    <Button className="w-full rounded-full h-12 text-base" size="lg">
+                      Proceed to Checkout
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    onClick={() => setLocation("/login")}
+                    className="w-full rounded-full h-12 text-base"
+                    size="lg"
+                  >
+                    Sign In to Checkout
                   </Button>
-                </Link>
+                )}
 
                 <Link href="/shop">
                   <Button variant="outline" className="w-full mt-2 rounded-full">

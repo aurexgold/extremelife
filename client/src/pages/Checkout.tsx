@@ -106,6 +106,23 @@ export default function Checkout() {
     }
   }, [cart.length, order, setLocation]);
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background py-12">
+        <div className="container mx-auto px-4 max-w-md text-center">
+          <h1 className="text-2xl font-bold mb-4">Please Log In</h1>
+          <p className="text-muted-foreground mb-6">You need to be logged in to checkout.</p>
+          <button
+            onClick={() => setLocation("/login")}
+            className="inline-flex items-center gap-2 text-primary hover:underline"
+          >
+            Go to Login →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!cart.length && !order) {
     return (
       <div className="min-h-screen bg-background py-8">
