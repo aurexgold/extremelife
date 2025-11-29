@@ -1,15 +1,25 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
 import { products } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ProductCard from "@/components/ProductCard";
 import { Heart, ArrowLeft, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Wishlist() {
-  const { wishlist, clearWishlist } = useWishlist();
+  const { wishlist, clearWishlist, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
+  const [, setLocation] = useLocation();
   
   const wishlistProducts = products.filter(p => wishlist.includes(p.id));
+
+  const handleAddToCart = (product: typeof products[0]) => {
+    addToCart({ productId: product.id, name: product.name, price: product.price, image: product.image, quantity: 1 });
+    removeFromWishlist(product.id);
+    toast.success(`${product.name} added to cart!`);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,7 +74,17 @@ export default function Wishlist() {
             {/* Wishlist Products */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
               {wishlistProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <div key={product.id} className="relative">
+                  <ProductCard product={product} />
+                  <Button 
+                    onClick={() => handleAddToCart(product)}
+                    className="absolute top-2 right-2 gap-2 rounded-full"
+                    size="sm"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    Add to Cart
+                  </Button>
+                </div>
               ))}
             </div>
 

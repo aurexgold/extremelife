@@ -21,6 +21,7 @@ export default function Navbar() {
     { name: "Schedule", href: "/live-calendar" },
     { name: "Loyalty Points", href: "/loyalty" },
     { name: "Referral", href: "/referral" },
+    { name: "Contact", href: "/contact" },
   ];
 
   return (

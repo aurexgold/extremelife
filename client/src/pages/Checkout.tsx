@@ -6,10 +6,11 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Check, AlertCircle } from "lucide-react";
+import { ArrowLeft, Check, AlertCircle, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { validateCheckoutForm, getFieldError, ValidationError } from "@/lib/validation";
 import { SHIPPING_OPTIONS, PAYMENT_OPTIONS, TAX_RATE, FREE_SHIPPING_THRESHOLD, LOYALTY_DISCOUNTS } from "@/lib/constants";
+import { validatePromoCode } from "@/lib/promos";
 
 export default function Checkout() {
   const { cart, getCartTotal, placeOrder } = useCart();
@@ -34,16 +35,31 @@ export default function Checkout() {
   const [selectedShipping, setSelectedShipping] = useState<"jnt" | "lbc" | "2go" | "lalamove">("jnt");
   const [selectedPayment, setSelectedPayment] = useState<"gcash" | "paymaya" | "cod">("gcash");
   const [order, setOrder] = useState<any>(null);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoDiscount, setPromoDiscount] = useState(0);
 
   const subtotal = getCartTotal();
   const loyaltyDiscount = getLoyaltyDiscount();
   const discountAmount = Math.round(subtotal * loyaltyDiscount);
-  const subtotalAfterDiscount = subtotal - discountAmount;
+  const subtotalAfterLoyalty = subtotal - discountAmount;
+  const promoDiscountAmount = Math.round(subtotalAfterLoyalty * promoDiscount / 100);
+  const subtotalAfterDiscount = subtotalAfterLoyalty - promoDiscountAmount;
   const tax = Math.round(subtotalAfterDiscount * TAX_RATE);
   
   const shippingOption = SHIPPING_OPTIONS.find(s => s.id === selectedShipping);
   const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : (shippingOption?.fee || 75);
   const total = subtotalAfterDiscount + tax + shippingFee;
+
+  const handleApplyPromo = () => {
+    const result = validatePromoCode(promoCode, subtotal);
+    if (result.valid) {
+      setPromoDiscount(result.discount);
+      toast.success(result.message);
+    } else {
+      toast.error(result.message);
+      setPromoDiscount(0);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -560,9 +576,37 @@ export default function Checkout() {
                   </div>
 
                   {loyaltyDiscount > 0 && user && (
-                    <div className="flex justify-between text-green-600 font-semibold">
+                    <div className="flex justify-between text-green-600 font-semibold text-sm">
                       <span>Loyalty Discount ({user.loyaltyTier})</span>
                       <span>-₱{discountAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+
+                  {promoDiscount > 0 && (
+                    <div className="flex justify-between text-blue-600 font-semibold text-sm">
+                      <span>Promo ({promoCode})</span>
+                      <span>-₱{promoDiscountAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+
+                  {step === "payment" && (
+                    <div className="flex gap-2 pt-2">
+                      <input
+                        type="text"
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                        placeholder="Enter promo code"
+                        className="flex-1 px-2 py-1 border border-input rounded text-sm"
+                      />
+                      <Button
+                        onClick={handleApplyPromo}
+                        variant="outline"
+                        size="sm"
+                        className="gap-1"
+                      >
+                        <Gift className="h-3 w-3" />
+                        Apply
+                      </Button>
                     </div>
                   )}
 

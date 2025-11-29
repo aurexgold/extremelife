@@ -32,6 +32,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Profile from "@/pages/Profile";
 import OrderDetail from "@/pages/OrderDetail";
+import Contact from "@/pages/Contact";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminProducts from "@/pages/AdminProducts";
 import AdminOrders from "@/pages/AdminOrders";
@@ -72,6 +73,7 @@ function Router() {
       <Route path="/live-stream/:id" component={LiveStreamDetail} />
       <Route path="/referral" component={ReferralProgram} />
       <Route path="/loyalty" component={LoyaltyProgram} />
+      <Route path="/contact" component={Contact} />
       <Route path="/cart" component={Cart} />
 
       {/* Protected Routes (Login Required) */}
