@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewsList from "@/components/ReviewsList";
 import ProductRating from "@/components/ProductRating";
+import ProductReviewsSection from "@/components/ProductReviewsSection";
 import WishlistButton from "@/components/WishlistButton";
 import Breadcrumb from "@/components/Breadcrumb";
 import InfoTabs from "@/components/InfoTabs";
@@ -214,7 +215,7 @@ export default function ProductDetail() {
               icon: <MessageSquare className="h-4 w-4" />,
               content: (
                 <div className="space-y-8">
-                  <ReviewsList productId={product.id} />
+                  <ProductReviewsSection productId={product.id} />
                   <ReviewForm productId={product.id} />
                 </div>
               ),
