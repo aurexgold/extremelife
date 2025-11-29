@@ -57,9 +57,8 @@ export default function ProductCard({ product }: ProductProps) {
   return (
     <>
       <QuickViewModal product={product} isOpen={showQuickView} onClose={() => setShowQuickView(false)} />
-      <Link href={`/product/${product.id}`}>
-        <a className="block">
-          <Card className="group overflow-hidden border-border/60 bg-card transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+      <Link href={`/product/${product.id}`} className="block">
+        <Card className="group overflow-hidden border-border/60 bg-card transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer">
           <div className="relative aspect-square overflow-hidden bg-muted">
             <img
               src={product.image}
@@ -157,8 +156,7 @@ export default function ProductCard({ product }: ProductProps) {
             </div>
           </CardFooter>
         </Card>
-      </a>
-    </Link>
+      </Link>
     </>
   );
 }

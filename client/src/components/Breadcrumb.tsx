@@ -16,8 +16,8 @@ export default function Breadcrumb({ items, current }: BreadcrumbProps) {
     <nav className="flex items-center gap-2 text-sm mb-6">
       {items.map((item, idx) => (
         <div key={item.href} className="flex items-center gap-2">
-          <Link href={item.href}>
-            <a className="text-primary hover:underline">{item.label}</a>
+          <Link href={item.href} className="text-primary hover:underline">
+            {item.label}
           </Link>
           {idx < items.length - 1 && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
         </div>

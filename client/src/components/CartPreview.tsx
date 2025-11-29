@@ -78,15 +78,16 @@ export default function CartPreview() {
                 <span>Subtotal:</span>
                 <span className="text-primary">₱{subtotal.toLocaleString("en-PH", { minimumFractionDigits: 2 })}</span>
               </div>
-              <Link href="/cart">
-                <Button
-                  className="w-full rounded-full"
-                  onClick={() => setIsOpen(false)}
-                  data-testid="button-go-to-cart-from-preview"
-                >
-                  View Full Cart
-                </Button>
-              </Link>
+              <Button
+                className="w-full rounded-full"
+                onClick={() => {
+                  window.location.href = "/cart";
+                  setIsOpen(false);
+                }}
+                data-testid="button-go-to-cart-from-preview"
+              >
+                View Full Cart
+              </Button>
             </div>
           )}
         </div>

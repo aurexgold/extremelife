@@ -68,12 +68,17 @@ export default function Navbar() {
                 <div className="pt-4 border-t space-y-2">
                   {user ? (
                     <>
-                      <Link href="/profile" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full gap-2 rounded-full">
-                          <User className="h-4 w-4" />
-                          My Profile
-                        </Button>
-                      </Link>
+                      <Button 
+                        variant="outline" 
+                        className="w-full gap-2 rounded-full"
+                        onClick={() => {
+                          setLocation("/profile");
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <User className="h-4 w-4" />
+                        My Profile
+                      </Button>
                       <Button
                         variant="ghost"
                         className="w-full gap-2 justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
@@ -89,16 +94,25 @@ export default function Navbar() {
                     </>
                   ) : (
                     <>
-                      <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full rounded-full">
-                          Sign In
-                        </Button>
-                      </Link>
-                      <Link href="/register" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full rounded-full">
-                          Create Account
-                        </Button>
-                      </Link>
+                      <Button 
+                        variant="outline" 
+                        className="w-full rounded-full"
+                        onClick={() => {
+                          setLocation("/login");
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        Sign In
+                      </Button>
+                      <Button 
+                        className="w-full rounded-full"
+                        onClick={() => {
+                          setLocation("/register");
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        Create Account
+                      </Button>
                     </>
                   )}
                 </div>
