@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Check } from "lucide-react";
 import WishlistButton from "./WishlistButton";
 import ProductRating from "./ProductRating";
+import { useCart } from "@/context/CartContext";
+import { toast } from "sonner";
 
 interface ProductProps {
   product: {
@@ -21,9 +24,26 @@ interface ProductProps {
 }
 
 export default function ProductCard({ product }: ProductProps) {
+  const { addToCart } = useCart();
+  const [isAdded, setIsAdded] = useState(false);
+  
   const discount = product.originalPrice 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1,
+    });
+    setIsAdded(true);
+    toast.success(`${product.name} added to cart!`);
+    setTimeout(() => setIsAdded(false), 2000);
+  };
 
   return (
     <Link href={`/product/${product.id}`}>
@@ -89,9 +109,13 @@ export default function ProductCard({ product }: ProductProps) {
             </div>
           </CardContent>
           <CardFooter className="p-5 pt-0 gap-2">
-            <Button onClick={(e) => e.preventDefault()} className="flex-1 rounded-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors" variant="outline">
-              <ShoppingCart className="h-4 w-4" />
-              View Details
+            <Button 
+              onClick={handleAddToCart}
+              className="flex-1 rounded-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors" 
+              variant={isAdded ? "default" : "outline"}
+            >
+              {isAdded ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
+              {isAdded ? "Added!" : "Add to Cart"}
             </Button>
             <div onClick={(e) => e.preventDefault()}>
               <WishlistButton productId={product.id} productName={product.name} size="default" showText={false} />

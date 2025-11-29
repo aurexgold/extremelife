@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { wishlist } = useWishlist();
+  const { getCartCount } = useCart();
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -100,13 +102,17 @@ export default function Navbar() {
               <span className="sr-only">Wishlist</span>
             </Button>
           </Link>
-          <Button variant="outline" size="icon" className="relative border-primary/20 hover:bg-primary/5 hover:text-primary">
-            <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
-              2
-            </span>
-            <span className="sr-only">Cart</span>
-          </Button>
+          <Link href="/cart">
+            <Button variant="outline" size="icon" className="relative border-primary/20 hover:bg-primary/5 hover:text-primary">
+              <ShoppingCart className="h-5 w-5" />
+              {getCartCount() > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
+                  {getCartCount()}
+                </span>
+              )}
+              <span className="sr-only">Cart</span>
+            </Button>
+          </Link>
         </div>
       </div>
     </nav>

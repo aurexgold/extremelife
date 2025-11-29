@@ -9,6 +9,7 @@ import { ReviewsProvider } from "@/context/ReviewsContext";
 import { LiveStreamProvider } from "@/context/LiveStreamContext";
 import { ReferralProvider } from "@/context/ReferralContext";
 import { LoyaltyProvider } from "@/context/LoyaltyContext";
+import { CartProvider } from "@/context/CartContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
@@ -19,6 +20,9 @@ import LiveStreamCalendar from "@/pages/LiveStreamCalendar";
 import LiveStreamDetail from "@/pages/LiveStreamDetail";
 import ReferralProgram from "@/pages/ReferralProgram";
 import LoyaltyProgram from "@/pages/LoyaltyProgram";
+import Cart from "@/pages/Cart";
+import Checkout from "@/pages/Checkout";
+import OrderHistory from "@/pages/OrderHistory";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminProducts from "@/pages/AdminProducts";
@@ -58,6 +62,9 @@ function Router() {
       <Route path="/live-stream/:id" component={LiveStreamDetail} />
       <Route path="/referral" component={ReferralProgram} />
       <Route path="/loyalty" component={LoyaltyProgram} />
+      <Route path="/cart" component={Cart} />
+      <Route path="/checkout" component={Checkout} />
+      <Route path="/orders" component={OrderHistory} />
       <Route path="/product/:id" component={ProductDetail} />
       <Route component={NotFound} />
     </Switch>
@@ -80,21 +87,23 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <LoyaltyProvider>
-        <ReferralProvider>
-          <LiveStreamProvider>
-            <ReviewsProvider>
-              <WishlistProvider>
-                <AdminProvider>
-                  <TooltipProvider>
-                    <AppContent />
-                  </TooltipProvider>
-                </AdminProvider>
-              </WishlistProvider>
-            </ReviewsProvider>
-          </LiveStreamProvider>
-        </ReferralProvider>
-      </LoyaltyProvider>
+      <CartProvider>
+        <LoyaltyProvider>
+          <ReferralProvider>
+            <LiveStreamProvider>
+              <ReviewsProvider>
+                <WishlistProvider>
+                  <AdminProvider>
+                    <TooltipProvider>
+                      <AppContent />
+                    </TooltipProvider>
+                  </AdminProvider>
+                </WishlistProvider>
+              </ReviewsProvider>
+            </LiveStreamProvider>
+          </ReferralProvider>
+        </LoyaltyProvider>
+      </CartProvider>
     </QueryClientProvider>
   );
 }

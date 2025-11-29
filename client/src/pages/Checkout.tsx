@@ -1,0 +1,470 @@
+import { useState, useEffect } from "react";
+import { useCart } from "@/context/CartContext";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Check } from "lucide-react";
+import { toast } from "sonner";
+
+export default function Checkout() {
+  const { cart, getCartTotal, placeOrder } = useCart();
+  const [, setLocation] = useLocation();
+  const [step, setStep] = useState<"info" | "shipping" | "payment" | "confirmation">("info");
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    barangay: "",
+    city: "",
+    province: "",
+    postalCode: "",
+  });
+
+  const [selectedShipping, setSelectedShipping] = useState<"jnt" | "lbc" | "2go" | "lalamove">("jnt");
+  const [selectedPayment, setSelectedPayment] = useState<"gcash" | "paymaya" | "cod">("gcash");
+  const [order, setOrder] = useState<any>(null);
+
+  const subtotal = getCartTotal();
+  const tax = Math.round(subtotal * 0.13);
+  const shippingFee = selectedShipping === "lalamove" ? 200 : 75;
+  const total = subtotal + tax + shippingFee;
+
+  const shippingOptions = [
+    { id: "jnt", name: "J&T Express", fee: 75, days: "2-3 days" },
+    { id: "lbc", name: "LBC Express", fee: 75, days: "3-5 days" },
+    { id: "2go", name: "2GO Express", fee: 75, days: "2-4 days" },
+    { id: "lalamove", name: "Lalamove (Metro Manila)", fee: 200, days: "Same day" },
+  ];
+
+  const paymentOptions = [
+    { id: "gcash", name: "GCash", logo: "💳", description: "Mobile wallet" },
+    { id: "paymaya", name: "PayMaya", logo: "💳", description: "Debit/prepaid card" },
+    { id: "cod", name: "Cash on Delivery", logo: "💵", description: "Pay when delivered" },
+  ];
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePlaceOrder = async () => {
+    if (!formData.name || !formData.email || !formData.address) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setIsProcessing(true);
+    // Simulate payment processing
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    const newOrder = placeOrder({
+      items: cart,
+      subtotal,
+      shipping: shippingFee,
+      tax,
+      total,
+      customerName: formData.name,
+      customerEmail: formData.email,
+      shippingAddress: `${formData.address}, ${formData.barangay}, ${formData.city}, ${formData.province} ${formData.postalCode}`,
+      shippingMethod: shippingOptions.find((s) => s.id === selectedShipping)?.name || "J&T Express",
+      paymentMethod: paymentOptions.find((p) => p.id === selectedPayment)?.name || "GCash",
+      status: "completed",
+    });
+
+    setOrder(newOrder);
+    setIsProcessing(false);
+    setStep("confirmation");
+  };
+
+  useEffect(() => {
+    if (!cart.length && !order) {
+      const timer = setTimeout(() => setLocation("/shop"), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [cart.length, order, setLocation]);
+
+  if (!cart.length && !order) {
+    return (
+      <div className="min-h-screen bg-background py-8">
+        <div className="container mx-auto px-4 md:px-8">
+          <p className="text-center text-muted-foreground">Your cart is empty. Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === "confirmation" && order) {
+    return (
+      <div className="min-h-screen bg-background py-8">
+        <div className="container mx-auto px-4 md:px-8 max-w-2xl">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check className="h-8 w-8 text-green-600" />
+            </div>
+            <h1 className="text-4xl font-bold font-serif text-foreground mb-2">Order Confirmed!</h1>
+            <p className="text-muted-foreground">Thank you for your purchase.</p>
+          </div>
+
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b">
+                <div>
+                  <p className="text-sm text-muted-foreground">Order ID</p>
+                  <p className="font-bold text-lg">{order.id}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Order Date</p>
+                  <p className="font-bold text-lg">{new Date(order.date).toLocaleDateString("en-PH")}</p>
+                </div>
+              </div>
+
+              <h3 className="font-bold mb-3">Order Details</h3>
+              <div className="space-y-2 mb-6 pb-6 border-b">
+                {order.items.map((item: any) => (
+                  <div key={item.productId} className="flex justify-between text-sm">
+                    <span>
+                      {item.name} x {item.quantity}
+                    </span>
+                    <span>₱{(item.price * item.quantity).toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-2 mb-6 pb-6 border-b">
+                <div className="flex justify-between text-sm">
+                  <span>Subtotal</span>
+                  <span>₱{order.subtotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Tax (13%)</span>
+                  <span>₱{order.tax.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Shipping ({order.shippingMethod})</span>
+                  <span>₱{order.shipping.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between font-bold text-lg mb-6">
+                <span>Total</span>
+                <span className="text-primary">₱{order.total.toLocaleString()}</span>
+              </div>
+
+              <div className="bg-secondary/10 p-4 rounded-lg mb-6">
+                <h4 className="font-bold mb-2">Shipping To:</h4>
+                <p className="text-sm text-muted-foreground">{order.customerName}</p>
+                <p className="text-sm text-muted-foreground">{order.shippingAddress}</p>
+              </div>
+
+              <div className="bg-secondary/10 p-4 rounded-lg mb-6">
+                <h4 className="font-bold mb-2">Payment Method:</h4>
+                <p className="text-sm">{order.paymentMethod}</p>
+              </div>
+
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200 mb-6">
+                <p className="text-sm text-green-800">
+                  ✓ Confirmation email sent to <strong>{order.customerEmail}</strong>
+                </p>
+              </div>
+
+              <Button
+                onClick={() => setLocation("/")}
+                className="w-full rounded-full h-12"
+                size="lg"
+              >
+                Back to Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background py-8">
+      <div className="container mx-auto px-4 md:px-8 max-w-4xl">
+        <button
+          onClick={() => setLocation("/cart")}
+          className="inline-flex items-center gap-2 text-primary hover:underline mb-6"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Cart
+        </button>
+
+        <h1 className="text-4xl font-bold font-serif text-foreground mb-8">Checkout</h1>
+
+        {/* Progress Steps */}
+        <div className="flex gap-4 mb-8">
+          {["info", "shipping", "payment"].map((s, idx) => (
+            <div
+              key={s}
+              className={`flex-1 h-1 rounded-full ${
+                step === s ? "bg-primary" : idx < ["info", "shipping", "payment"].indexOf(step) ? "bg-green-500" : "bg-muted"
+              }`}
+            />
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            {step === "info" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Customer Information</CardTitle>
+                  <CardDescription>Enter your details for delivery</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Full Name *"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="col-span-2 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email *"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="col-span-2 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="Phone Number"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="col-span-2 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <h3 className="font-bold mb-4">Shipping Address</h3>
+                    <div className="space-y-4">
+                      <input
+                        type="text"
+                        name="address"
+                        placeholder="Street Address *"
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                      <input
+                        type="text"
+                        name="barangay"
+                        placeholder="Barangay"
+                        value={formData.barangay}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <input
+                          type="text"
+                          name="city"
+                          placeholder="City *"
+                          value={formData.city}
+                          onChange={handleInputChange}
+                          className="px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                        <input
+                          type="text"
+                          name="province"
+                          placeholder="Province"
+                          value={formData.province}
+                          onChange={handleInputChange}
+                          className="px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        name="postalCode"
+                        placeholder="Postal Code"
+                        value={formData.postalCode}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => setStep("shipping")}
+                    className="w-full rounded-full h-12 mt-6"
+                    size="lg"
+                  >
+                    Continue to Shipping
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {step === "shipping" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Shipping Method</CardTitle>
+                  <CardDescription>Choose your preferred delivery option</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {shippingOptions.map((option) => (
+                    <div
+                      key={option.id}
+                      onClick={() => setSelectedShipping(option.id as any)}
+                      className={`p-4 rounded-lg border-2 cursor-pointer transition ${
+                        selectedShipping === option.id
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h4 className="font-bold mb-1">{option.name}</h4>
+                          <p className="text-sm text-muted-foreground">{option.days}</p>
+                        </div>
+                        <span className="font-bold">₱{option.fee}</span>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="pt-4 border-t bg-secondary/5 p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      Free shipping on orders over ₱2,500 (Standard methods only)
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3 mt-6">
+                    <Button
+                      onClick={() => setStep("info")}
+                      variant="outline"
+                      className="flex-1 rounded-full"
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      onClick={() => setStep("payment")}
+                      className="flex-1 rounded-full h-12"
+                      size="lg"
+                    >
+                      Continue to Payment
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {step === "payment" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payment Method</CardTitle>
+                  <CardDescription>Choose how you'd like to pay</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {paymentOptions.map((option) => (
+                    <div
+                      key={option.id}
+                      onClick={() => setSelectedPayment(option.id as any)}
+                      className={`p-4 rounded-lg border-2 cursor-pointer transition flex items-center gap-4 ${
+                        selectedPayment === option.id
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="text-3xl">{option.logo}</div>
+                      <div className="flex-1">
+                        <h4 className="font-bold">{option.name}</h4>
+                        <p className="text-sm text-muted-foreground">{option.description}</p>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="pt-4 border-t bg-secondary/5 p-4 rounded-lg">
+                    <p className="text-sm">
+                      ✓ Your payment information is secure and encrypted
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3 mt-6">
+                    <Button
+                      onClick={() => setStep("shipping")}
+                      variant="outline"
+                      className="flex-1 rounded-full"
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      onClick={handlePlaceOrder}
+                      className="flex-1 rounded-full h-12"
+                      size="lg"
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? "Processing..." : "Place Order"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Order Summary */}
+          <div>
+            <Card className="sticky top-24">
+              <CardContent className="p-6">
+                <h3 className="font-bold mb-4">Order Summary</h3>
+
+                <div className="space-y-3 mb-4 pb-4 border-b max-h-64 overflow-y-auto">
+                  {cart.map((item) => (
+                    <div key={item.productId} className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        {item.name} x {item.quantity}
+                      </span>
+                      <span className="font-semibold">
+                        ₱{(item.price * item.quantity).toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-2 mb-4 pb-4 border-b">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>₱{subtotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Tax (13%)</span>
+                    <span>₱{tax.toLocaleString()}</span>
+                  </div>
+                  {step !== "info" && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Shipping</span>
+                      <span>₱{shippingFee}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-between font-bold text-lg mb-6">
+                  <span>Total</span>
+                  <span className="text-primary">
+                    ₱{step === "info" ? (subtotal + tax).toLocaleString() : (subtotal + tax + shippingFee).toLocaleString()}
+                  </span>
+                </div>
+
+                {step === "payment" && (
+                  <Badge className="w-full text-center justify-center py-2 bg-green-100 text-green-800 border-0">
+                    Ready to place order
+                  </Badge>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
