@@ -15,6 +15,7 @@ import { UserProvider } from "@/context/UserContext";
 import { FilterProvider } from "@/context/FilterContext";
 import { StreamerProvider } from "@/context/StreamerContext";
 import { UserGroupsProvider } from "@/context/UserGroupsContext";
+import { AbandonedCartProvider } from "@/context/AbandonedCartContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
@@ -44,7 +45,9 @@ import AdminCustomers from "@/pages/AdminCustomers";
 import AdminLiveStream from "@/pages/AdminLiveStream";
 import StreamerDashboard from "@/pages/StreamerDashboard";
 import AdminUserGroups from "@/pages/AdminUserGroups";
+import AdminAbandonedCarts from "@/pages/AdminAbandonedCarts";
 import CartPreview from "@/components/CartPreview";
+import AbandonedCartBanner from "@/components/AbandonedCartBanner";
 
 function Router() {
   const { isAuthenticated } = useAdmin();
@@ -66,6 +69,7 @@ function Router() {
           <Route path="/admin/live" component={AdminLiveStream} />
           <Route path="/admin/promotions" component={AdminPromotions} />
           <Route path="/admin/user-groups" component={AdminUserGroups} />
+          <Route path="/admin/abandoned-carts" component={AdminAbandonedCarts} />
         </>
       )}
 
@@ -104,6 +108,7 @@ function AppContent() {
       {!isAdminRoute && <Navbar />}
       <Router />
       {!isAdminRoute && <CartPreview />}
+      {!isAdminRoute && <AbandonedCartBanner />}
       <Toaster />
     </>
   );
@@ -120,9 +125,10 @@ function App() {
               <ReferralProvider>
                 <LiveStreamProvider>
                   <StreamerProvider>
-                    <UserGroupsProvider>
-                      <ReviewsProvider>
-                      <WishlistProvider>
+                    <AbandonedCartProvider>
+                      <UserGroupsProvider>
+                        <ReviewsProvider>
+                        <WishlistProvider>
                         <AdminProvider>
                           <TooltipProvider>
                             <AppContent />
@@ -131,6 +137,7 @@ function App() {
                       </WishlistProvider>
                     </ReviewsProvider>
                     </UserGroupsProvider>
+                    </AbandonedCartProvider>
                   </StreamerProvider>
                 </LiveStreamProvider>
               </ReferralProvider>

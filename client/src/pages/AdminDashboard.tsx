@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { LogOut, Package, ShoppingCart, TrendingUp, Users, Video, Trash2, Edit, Plus, AlertCircle, TrendingDown } from "lucide-react";
+import { LogOut, Package, ShoppingCart, TrendingUp, Users, Video, Trash2, Edit, Plus, AlertCircle, TrendingDown, AlertTriangle } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { products } from "@/lib/data";
 import OrderDetailsModal from "@/components/OrderDetailsModal";
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="products" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="products" className="gap-2">
               <Package className="h-4 w-4" />
               Products
@@ -132,6 +132,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="live" className="gap-2">
               <Video className="h-4 w-4" />
               Live Stream
+            </TabsTrigger>
+            <TabsTrigger value="abandoned" className="gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              Abandoned
             </TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
@@ -476,6 +480,14 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Abandoned Carts Tab */}
+          <TabsContent value="abandoned">
+            <Button onClick={() => navigate("/admin/abandoned-carts")} className="gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              View Abandoned Carts Dashboard
+            </Button>
           </TabsContent>
 
           {/* Settings Tab */}
