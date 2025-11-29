@@ -1,11 +1,13 @@
 import { Link, useLocation } from "wouter";
-import { ShoppingCart, Menu, Search, Leaf, Heart, User, LogOut } from "lucide-react";
+import { ShoppingCart, Menu, Leaf, Heart, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import NavbarSearch from "./NavbarSearch";
+import NavbarMoreMenu from "./NavbarMoreMenu";
 
 export default function Navbar() {
   const [location, setLocation] = useLocation();
@@ -14,7 +16,15 @@ export default function Navbar() {
   const { getCartCount } = useCart();
   const { user, logout } = useAuth();
 
-  const navLinks = [
+  const primaryNavLinks = [
+    { name: "Home", href: "/" },
+    { name: "Shop", href: "/shop" },
+    { name: "Live Selling", href: "/live" },
+    { name: "Schedule", href: "/live-calendar" },
+    { name: "Loyalty Points", href: "/loyalty" },
+  ];
+
+  const mobileNavLinks = [
     { name: "Home", href: "/" },
     { name: "Shop", href: "/shop" },
     { name: "Live Selling", href: "/live" },
@@ -44,7 +54,7 @@ export default function Navbar() {
                   Extreme Life
                 </div>
                 <div className="flex flex-col gap-4">
-                  {navLinks.map((link) => (
+                  {mobileNavLinks.map((link) => (
                     <Link 
                       key={link.href} 
                       href={link.href}
@@ -112,8 +122,8 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex md:gap-8">
-          {navLinks.map((link) => (
+        <div className="hidden md:flex md:items-center md:gap-8">
+          {primaryNavLinks.map((link) => (
             <Link 
               key={link.href} 
               href={link.href}
@@ -124,14 +134,16 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          <NavbarMoreMenu />
+        </div>
+
+        {/* Search Bar */}
+        <div className="hidden lg:flex">
+          <NavbarSearch />
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="hidden sm:flex">
-            <Search className="h-5 w-5" />
-            <span className="sr-only">Search</span>
-          </Button>
           <Link href="/wishlist">
             <Button variant="ghost" size="icon" className="relative hover:text-red-500">
               <Heart className="h-5 w-5" />
