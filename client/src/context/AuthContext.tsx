@@ -8,6 +8,7 @@ export interface AuthUser {
   role: "customer" | "streamer" | "admin";
   loyaltyTier: "bronze" | "silver" | "gold" | "platinum";
   loyaltyPoints: number;
+  userGroupId: string;
   createdAt: string;
   streamerStats?: {
     totalEarnings: number;
@@ -38,6 +39,7 @@ const MOCK_USERS: Record<string, { password: string; user: AuthUser }> = {
       role: "customer",
       loyaltyTier: "gold",
       loyaltyPoints: 2340,
+      userGroupId: "group3",
       createdAt: "2024-06-15",
     },
   },
@@ -51,6 +53,7 @@ const MOCK_USERS: Record<string, { password: string; user: AuthUser }> = {
       role: "streamer",
       loyaltyTier: "platinum",
       loyaltyPoints: 5000,
+      userGroupId: "group5",
       createdAt: "2024-01-15",
       streamerStats: {
         totalEarnings: 28500,
@@ -95,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       role: "customer",
       loyaltyTier: "bronze",
       loyaltyPoints: 0,
+      userGroupId: "group1",
       createdAt: new Date().toISOString().split("T")[0],
     };
 

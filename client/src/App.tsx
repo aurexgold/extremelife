@@ -14,6 +14,7 @@ import { CartProvider } from "@/context/CartContext";
 import { UserProvider } from "@/context/UserContext";
 import { FilterProvider } from "@/context/FilterContext";
 import { StreamerProvider } from "@/context/StreamerContext";
+import { UserGroupsProvider } from "@/context/UserGroupsContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
@@ -42,6 +43,7 @@ import AdminPromotions from "@/pages/AdminPromotions";
 import AdminCustomers from "@/pages/AdminCustomers";
 import AdminLiveStream from "@/pages/AdminLiveStream";
 import StreamerDashboard from "@/pages/StreamerDashboard";
+import AdminUserGroups from "@/pages/AdminUserGroups";
 import CartPreview from "@/components/CartPreview";
 
 function Router() {
@@ -63,6 +65,7 @@ function Router() {
           <Route path="/admin/customers" component={AdminCustomers} />
           <Route path="/admin/live" component={AdminLiveStream} />
           <Route path="/admin/promotions" component={AdminPromotions} />
+          <Route path="/admin/user-groups" component={AdminUserGroups} />
         </>
       )}
 
@@ -117,7 +120,8 @@ function App() {
               <ReferralProvider>
                 <LiveStreamProvider>
                   <StreamerProvider>
-                    <ReviewsProvider>
+                    <UserGroupsProvider>
+                      <ReviewsProvider>
                       <WishlistProvider>
                         <AdminProvider>
                           <TooltipProvider>
@@ -126,6 +130,7 @@ function App() {
                         </AdminProvider>
                       </WishlistProvider>
                     </ReviewsProvider>
+                    </UserGroupsProvider>
                   </StreamerProvider>
                 </LiveStreamProvider>
               </ReferralProvider>
