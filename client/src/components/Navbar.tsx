@@ -15,7 +15,8 @@ export default function Navbar() {
     { name: "Shop", href: "/shop" },
     { name: "Live Selling", href: "/live" },
     { name: "Schedule", href: "/live-calendar" },
-    { name: "Earn Rewards", href: "/referral" },
+    { name: "Loyalty Points", href: "/loyalty" },
+    { name: "Referral", href: "/referral" },
   ];
 
   return (

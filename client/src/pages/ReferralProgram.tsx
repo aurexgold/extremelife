@@ -13,12 +13,16 @@ import {
   Clock,
   Zap,
   MessageCircle,
+  Settings,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ReferralProgram() {
-  const { stats, claimRewards } = useReferral();
+  const { stats, claimRewards, toggleReferralProgram, updateRewardAmount } = useReferral();
   const [copied, setCopied] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [rewardAmount, setRewardAmount] = useState(stats.rewardPerReferral);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(stats.referralLink);
@@ -57,16 +61,107 @@ export default function ReferralProgram() {
     rewarded: "bg-green-100 text-green-800",
   };
 
+  const handleUpdateReward = () => {
+    updateRewardAmount(rewardAmount);
+    toast.success("Reward amount updated!");
+  };
+
+  if (!stats.isEnabled) {
+    return (
+      <div className="min-h-screen bg-background py-8">
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="mb-12">
+            <h1 className="text-4xl font-bold font-serif text-foreground mb-2">Referral Program</h1>
+            <p className="text-lg text-muted-foreground">
+              Earn rewards for every friend who joins. It's a win-win for everyone!
+            </p>
+          </div>
+
+          <Card className="border-yellow-200 bg-yellow-50">
+            <CardContent className="p-8 text-center">
+              <AlertCircle className="h-12 w-12 text-yellow-600 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-foreground mb-2">Referral Program Disabled</h2>
+              <p className="text-muted-foreground mb-6">
+                The referral program is currently disabled. Enable it to start earning rewards.
+              </p>
+              <Button
+                size="lg"
+                onClick={() => {
+                  toggleReferralProgram();
+                  toast.success("Referral program enabled!");
+                }}
+              >
+                Enable Referral Program
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="container mx-auto px-4 md:px-8">
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold font-serif text-foreground mb-2">Referral Program</h1>
-          <p className="text-lg text-muted-foreground">
-            Earn rewards for every friend who joins. It's a win-win for everyone!
-          </p>
+        <div className="mb-12 flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-bold font-serif text-foreground mb-2">Referral Program</h1>
+            <p className="text-lg text-muted-foreground">
+              Earn rewards for every friend who joins. It's a win-win for everyone!
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => setShowSettings(!showSettings)}
+          >
+            <Settings className="h-4 w-4" />
+            Settings
+          </Button>
         </div>
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <Card className="mb-12 border-primary/20 bg-primary/5">
+            <CardHeader>
+              <CardTitle>Referral Program Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold mb-2">Reward Per Referral (₱)</label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    value={rewardAmount}
+                    onChange={(e) => setRewardAmount(parseInt(e.target.value) || 0)}
+                    className="flex-1 px-3 py-2 border border-input rounded-lg"
+                    min="0"
+                    step="50"
+                  />
+                  <Button onClick={handleUpdateReward}>Update</Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Current: ₱{stats.rewardPerReferral}</p>
+              </div>
+
+              <div className="pt-4 border-t">
+                <label className="block text-sm font-bold mb-3">Program Status</label>
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={() => {
+                    toggleReferralProgram();
+                    setShowSettings(false);
+                    toast.success("Referral program disabled!");
+                  }}
+                >
+                  Disable Referral Program
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Referral Card */}
         <Card className="mb-12 overflow-hidden border-accent/30 bg-gradient-to-br from-accent/5 to-primary/5">

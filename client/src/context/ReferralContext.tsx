@@ -23,6 +23,8 @@ export interface ReferralStats {
   totalEarnings: number;
   pendingEarnings: number;
   referrals: Referral[];
+  isEnabled: boolean;
+  rewardPerReferral: number;
 }
 
 interface ReferralContextType {
@@ -32,6 +34,8 @@ interface ReferralContextType {
   getReferralLink: (code: string) => string;
   updateReferralStatus: (referralId: string, status: Referral["status"]) => void;
   claimRewards: () => void;
+  toggleReferralProgram: () => void;
+  updateRewardAmount: (amount: number) => void;
 }
 
 export const ReferralContext = createContext<ReferralContextType | undefined>(undefined);
@@ -50,6 +54,8 @@ const MOCK_STATS: ReferralStats = {
   rewardedReferrals: 4,
   totalEarnings: 2400,
   pendingEarnings: 1600,
+  isEnabled: true,
+  rewardPerReferral: 200,
   referrals: [
     {
       id: "1",
@@ -116,6 +122,7 @@ export function ReferralProvider({ children }: { children: ReactNode }) {
   });
 
   const addReferral = (newReferral: Omit<Referral, "id">) => {
+    if (!stats.isEnabled) return;
     const referral: Referral = {
       ...newReferral,
       id: Date.now().toString(),
@@ -124,7 +131,7 @@ export function ReferralProvider({ children }: { children: ReactNode }) {
       ...stats,
       referrals: [referral, ...stats.referrals],
       totalReferrals: stats.totalReferrals + 1,
-      pendingEarnings: stats.pendingEarnings + 500,
+      pendingEarnings: stats.pendingEarnings + stats.rewardPerReferral,
     };
     setStats(updated);
     localStorage.setItem("referralStats", JSON.stringify(updated));
@@ -140,6 +147,7 @@ export function ReferralProvider({ children }: { children: ReactNode }) {
   };
 
   const updateReferralStatus = (referralId: string, status: Referral["status"]) => {
+    if (!stats.isEnabled) return;
     const referral = stats.referrals.find((r) => r.id === referralId);
     if (!referral) return;
 
@@ -158,8 +166,8 @@ export function ReferralProvider({ children }: { children: ReactNode }) {
     } else if (oldStatus === "active" && status === "rewarded") {
       activeCount -= 1;
       rewardedCount += 1;
-      pendingEarnings -= 200;
-      totalEarnings += 200;
+      pendingEarnings -= stats.rewardPerReferral;
+      totalEarnings += stats.rewardPerReferral;
     }
 
     const updated = {
@@ -184,6 +192,24 @@ export function ReferralProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("referralStats", JSON.stringify(updated));
   };
 
+  const toggleReferralProgram = () => {
+    const updated = {
+      ...stats,
+      isEnabled: !stats.isEnabled,
+    };
+    setStats(updated);
+    localStorage.setItem("referralStats", JSON.stringify(updated));
+  };
+
+  const updateRewardAmount = (amount: number) => {
+    const updated = {
+      ...stats,
+      rewardPerReferral: amount,
+    };
+    setStats(updated);
+    localStorage.setItem("referralStats", JSON.stringify(updated));
+  };
+
   return (
     <ReferralContext.Provider
       value={{
@@ -193,6 +219,8 @@ export function ReferralProvider({ children }: { children: ReactNode }) {
         getReferralLink,
         updateReferralStatus,
         claimRewards,
+        toggleReferralProgram,
+        updateRewardAmount,
       }}
     >
       {children}
