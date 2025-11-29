@@ -5,18 +5,50 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { LogOut, Package, ShoppingCart, TrendingUp, Users, Video, Trash2, Edit, Plus } from "lucide-react";
+import { LogOut, Package, ShoppingCart, TrendingUp, Users, Video, Trash2, Edit, Plus, AlertCircle, TrendingDown } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { products } from "@/lib/data";
+import OrderDetailsModal from "@/components/OrderDetailsModal";
 
 export default function AdminDashboard() {
   const [, navigate] = useLocation();
   const { logout, adminName } = useAdmin();
-  const [productsList, setProductsList] = useState(products);
+  const [productsList, setProductsList] = useState(products.map(p => ({ ...p, stock: Math.floor(Math.random() * 30) + 5 })));
   const [orders] = useState([
     { id: 1, customer: "Maria Santos", total: 2499, status: "Delivered", date: "2024-11-27" },
     { id: 2, customer: "Juan Dela Cruz", total: 1849, status: "Processing", date: "2024-11-28" },
     { id: 3, customer: "Rosa Gonzales", total: 3299, status: "In Transit", date: "2024-11-28" },
   ]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+
+  // Sales analytics data
+  const salesData = [
+    { date: "Nov 20", revenue: 8400, orders: 12 },
+    { date: "Nov 21", revenue: 9200, orders: 15 },
+    { date: "Nov 22", revenue: 7800, orders: 10 },
+    { date: "Nov 23", revenue: 11200, orders: 18 },
+    { date: "Nov 24", revenue: 10500, orders: 16 },
+    { date: "Nov 25", revenue: 12300, orders: 22 },
+    { date: "Nov 26", revenue: 9800, orders: 14 },
+    { date: "Nov 27", revenue: 13400, orders: 25 },
+    { date: "Nov 28", revenue: 11200, orders: 20 },
+  ];
+
+  const topProducts = [
+    { name: "Lavender Oil", sales: 248, revenue: 12400 },
+    { name: "Peppermint Soap", sales: 156, revenue: 8580 },
+    { name: "Eucalyptus Oil", sales: 132, revenue: 7920 },
+    { name: "Ginger Tea", sales: 98, revenue: 4900 },
+  ];
+
+  const orderStatusData = [
+    { name: "Delivered", value: 42, fill: "#10b981" },
+    { name: "In Transit", value: 18, fill: "#3b82f6" },
+    { name: "Processing", value: 12, fill: "#f59e0b" },
+  ];
+
+  const lowStockProducts = productsList.filter(p => p.stock < 10);
 
   const handleLogout = () => {
     logout();
@@ -25,6 +57,11 @@ export default function AdminDashboard() {
 
   const handleDeleteProduct = (id: number) => {
     setProductsList(productsList.filter(p => p.id !== id));
+  };
+
+  const handleViewOrder = (order: any) => {
+    setSelectedOrder(order);
+    setShowOrderModal(true);
   };
 
   const stats = [
@@ -79,7 +116,7 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="products" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="products" className="gap-2">
               <Package className="h-4 w-4" />
               Products
@@ -87,6 +124,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="orders" className="gap-2">
               <ShoppingCart className="h-4 w-4" />
               Orders
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Analytics
             </TabsTrigger>
             <TabsTrigger value="live" className="gap-2">
               <Video className="h-4 w-4" />
@@ -115,6 +156,7 @@ export default function AdminDashboard() {
                       <tr className="border-b">
                         <th className="text-left py-3 px-4 font-semibold">Product</th>
                         <th className="text-left py-3 px-4 font-semibold">Price</th>
+                        <th className="text-left py-3 px-4 font-semibold">Stock</th>
                         <th className="text-left py-3 px-4 font-semibold">Category</th>
                         <th className="text-left py-3 px-4 font-semibold">Platforms</th>
                         <th className="text-left py-3 px-4 font-semibold">Actions</th>
@@ -122,9 +164,20 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody>
                       {productsList.map((product) => (
-                        <tr key={product.id} className="border-b hover:bg-muted/30 transition">
+                        <tr key={product.id} className={`border-b hover:bg-muted/30 transition ${product.stock < 10 ? 'bg-red-50/50' : ''}`}>
                           <td className="py-3 px-4 font-medium">{product.name}</td>
                           <td className="py-3 px-4">₱{product.price.toFixed(2)}</td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold">{product.stock}</span>
+                              {product.stock < 10 && (
+                                <div className="flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
+                                  <AlertCircle className="h-3 w-3" />
+                                  Low Stock
+                                </div>
+                              )}
+                            </div>
+                          </td>
                           <td className="py-3 px-4">
                             <span className="bg-secondary/20 text-secondary-foreground px-2 py-1 rounded text-xs font-medium">
                               {product.category}
@@ -209,7 +262,13 @@ export default function AdminDashboard() {
                           </td>
                           <td className="py-3 px-4 text-sm">{order.date}</td>
                           <td className="py-3 px-4">
-                            <Button variant="ghost" size="sm">View</Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleViewOrder(order)}
+                            >
+                              View
+                            </Button>
                           </td>
                         </tr>
                       ))}
@@ -289,6 +348,136 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            {/* Low Stock Alert */}
+            {lowStockProducts.length > 0 && (
+              <Card className="border-red-200 bg-red-50">
+                <CardContent className="p-4 flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-red-900">{lowStockProducts.length} Products Running Low on Stock</p>
+                    <p className="text-sm text-red-800 mt-1">
+                      {lowStockProducts.map(p => p.name).join(", ")} need restocking
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Revenue Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue & Orders Trend</CardTitle>
+                <CardDescription>Last 9 days performance</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={salesData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis yAxisId="left" />
+                    <YAxis yAxisId="right" orientation="right" />
+                    <Tooltip />
+                    <Legend />
+                    <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="#8b5cf6" strokeWidth={2} name="Revenue (₱)" />
+                    <Line yAxisId="right" type="monotone" dataKey="orders" stroke="#06b6d4" strokeWidth={2} name="Orders" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Top Products */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Top Selling Products</CardTitle>
+                  <CardDescription>By sales volume</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={topProducts}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="sales" fill="#3b82f6" name="Units Sold" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Order Status Distribution */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Order Status Distribution</CardTitle>
+                  <CardDescription>Current orders by status</CardDescription>
+                </CardHeader>
+                <CardContent className="flex justify-center">
+                  <ResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie
+                        data={orderStatusData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value }) => `${name}: ${value}`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {orderStatusData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Revenue Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Total Revenue (9 days)</p>
+                    <p className="text-3xl font-bold">₱98,200</p>
+                    <div className="flex items-center gap-1 text-green-600 text-sm">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>+12.5% vs previous period</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Avg Order Value</p>
+                    <p className="text-3xl font-bold">₱2,456</p>
+                    <div className="flex items-center gap-1 text-green-600 text-sm">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>+5.2% increase</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Conversion Rate</p>
+                    <p className="text-3xl font-bold">3.8%</p>
+                    <div className="flex items-center gap-1 text-red-600 text-sm">
+                      <TrendingDown className="h-4 w-4" />
+                      <span>-0.3% decrease</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           {/* Settings Tab */}
           <TabsContent value="settings">
             <Card>
@@ -339,6 +528,13 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Order Details Modal */}
+      <OrderDetailsModal 
+        order={selectedOrder} 
+        isOpen={showOrderModal} 
+        onClose={() => setShowOrderModal(false)}
+      />
     </div>
   );
 }
