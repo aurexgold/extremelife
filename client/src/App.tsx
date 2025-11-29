@@ -6,12 +6,15 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AdminProvider, useAdmin } from "@/context/AdminContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { ReviewsProvider } from "@/context/ReviewsContext";
+import { LiveStreamProvider } from "@/context/LiveStreamContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
 import Live from "@/pages/Live";
 import Wishlist from "@/pages/Wishlist";
 import ProductDetail from "@/pages/ProductDetail";
+import LiveStreamCalendar from "@/pages/LiveStreamCalendar";
+import LiveStreamDetail from "@/pages/LiveStreamDetail";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminProducts from "@/pages/AdminProducts";
@@ -47,6 +50,8 @@ function Router() {
       <Route path="/live" component={Live} />
       <Route path="/shop" component={Home} />
       <Route path="/wishlist" component={Wishlist} />
+      <Route path="/live-calendar" component={LiveStreamCalendar} />
+      <Route path="/live-stream/:id" component={LiveStreamDetail} />
       <Route path="/product/:id" component={ProductDetail} />
       <Route component={NotFound} />
     </Switch>
@@ -69,15 +74,17 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ReviewsProvider>
-        <WishlistProvider>
-          <AdminProvider>
-            <TooltipProvider>
-              <AppContent />
-            </TooltipProvider>
-          </AdminProvider>
-        </WishlistProvider>
-      </ReviewsProvider>
+      <LiveStreamProvider>
+        <ReviewsProvider>
+          <WishlistProvider>
+            <AdminProvider>
+              <TooltipProvider>
+                <AppContent />
+              </TooltipProvider>
+            </AdminProvider>
+          </WishlistProvider>
+        </ReviewsProvider>
+      </LiveStreamProvider>
     </QueryClientProvider>
   );
 }
