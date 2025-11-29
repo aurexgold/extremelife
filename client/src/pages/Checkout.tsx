@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/AuthContext";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +13,8 @@ import { SHIPPING_OPTIONS, PAYMENT_OPTIONS, TAX_RATE, FREE_SHIPPING_THRESHOLD, L
 
 export default function Checkout() {
   const { cart, getCartTotal, placeOrder } = useCart();
-  const { currentUser, getLoyaltyDiscount } = useUser();
+  const { user } = useAuth();
+  const { getLoyaltyDiscount } = useUser();
   const [, setLocation] = useLocation();
   const [step, setStep] = useState<"info" | "shipping" | "payment" | "confirmation">("info");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -89,7 +91,7 @@ export default function Checkout() {
     const orderWithDiscount = {
       ...newOrder,
       loyaltyDiscount: discountAmount,
-      loyaltyTier: currentUser?.loyaltyTier || "bronze",
+      loyaltyTier: user?.loyaltyTier || "bronze",
     };
 
     setOrder(orderWithDiscount);
@@ -540,9 +542,9 @@ export default function Checkout() {
                     <span>₱{subtotal.toLocaleString()}</span>
                   </div>
 
-                  {loyaltyDiscount > 0 && (
+                  {loyaltyDiscount > 0 && user && (
                     <div className="flex justify-between text-green-600 font-semibold">
-                      <span>Loyalty Discount ({currentUser?.loyaltyTier})</span>
+                      <span>Loyalty Discount ({user.loyaltyTier})</span>
                       <span>-₱{discountAmount.toLocaleString()}</span>
                     </div>
                   )}
@@ -565,9 +567,9 @@ export default function Checkout() {
                   <span className="text-primary">₱{total.toLocaleString()}</span>
                 </div>
 
-                {loyaltyDiscount > 0 && (
+                {loyaltyDiscount > 0 && user && (
                   <Badge className="w-full justify-center py-2 mb-4 bg-green-100 text-green-800 border-0">
-                    {currentUser?.loyaltyTier?.toUpperCase()} Member: {Math.round(loyaltyDiscount * 100)}% off
+                    {user.loyaltyTier.toUpperCase()} Member: {Math.round(loyaltyDiscount * 100)}% off
                   </Badge>
                 )}
 

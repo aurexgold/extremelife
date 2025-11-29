@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AdminProvider, useAdmin } from "@/context/AdminContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { ReviewsProvider } from "@/context/ReviewsContext";
 import { LiveStreamProvider } from "@/context/LiveStreamContext";
@@ -27,6 +28,8 @@ import Checkout from "@/pages/Checkout";
 import OrderHistory from "@/pages/OrderHistory";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 import AdminProducts from "@/pages/AdminProducts";
 import AdminOrders from "@/pages/AdminOrders";
 import AdminPromotions from "@/pages/AdminPromotions";
@@ -57,6 +60,8 @@ function Router() {
 
       {/* Public Routes */}
       <Route path="/" component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route path="/live" component={Live} />
       <Route path="/shop" component={Home} />
       <Route path="/wishlist" component={Wishlist} />
@@ -89,8 +94,9 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <FilterProvider>
-        <UserProvider>
+      <AuthProvider>
+        <FilterProvider>
+          <UserProvider>
           <CartProvider>
             <LoyaltyProvider>
               <ReferralProvider>
@@ -110,6 +116,7 @@ function App() {
           </CartProvider>
         </UserProvider>
       </FilterProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
