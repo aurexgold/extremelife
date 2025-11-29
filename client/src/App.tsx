@@ -10,28 +10,31 @@ import Home from "@/pages/Home";
 import Live from "@/pages/Live";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
-
-function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
-  const { isAuthenticated } = useAdmin();
-
-  if (!isAuthenticated) {
-    return <AdminLogin />;
-  }
-
-  return <Component />;
-}
+import AdminProducts from "@/pages/AdminProducts";
+import AdminOrders from "@/pages/AdminOrders";
+import AdminPromotions from "@/pages/AdminPromotions";
+import AdminCustomers from "@/pages/AdminCustomers";
+import AdminLiveStream from "@/pages/AdminLiveStream";
 
 function Router() {
   const { isAuthenticated } = useAdmin();
 
+  if (!isAuthenticated && window.location.pathname.startsWith("/admin")) {
+    return <Route path="/admin/login" component={AdminLogin} />;
+  }
+
   return (
     <Switch>
       {/* Admin Routes */}
-      {!isAuthenticated && <Route path="/admin/login" component={AdminLogin} />}
+      <Route path="/admin/login" component={AdminLogin} />
       {isAuthenticated && (
         <>
           <Route path="/admin/dashboard" component={AdminDashboard} />
-          <Route path="/admin/*" component={AdminDashboard} />
+          <Route path="/admin/products" component={AdminProducts} />
+          <Route path="/admin/orders" component={AdminOrders} />
+          <Route path="/admin/customers" component={AdminCustomers} />
+          <Route path="/admin/live" component={AdminLiveStream} />
+          <Route path="/admin/promotions" component={AdminPromotions} />
         </>
       )}
 
@@ -45,9 +48,14 @@ function Router() {
 }
 
 function AppContent() {
+  const { isAuthenticated } = useAdmin();
+
+  // Don't show navbar on admin pages
+  const isAdminRoute = window.location.pathname.startsWith("/admin");
+
   return (
     <>
-      <Navbar />
+      {!isAdminRoute && <Navbar />}
       <Router />
       <Toaster />
     </>
