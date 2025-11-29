@@ -71,7 +71,6 @@ function Router() {
       <Route path="/live" component={Live} />
       <Route path="/shop" component={Home} />
       <Route path="/wishlist" component={Wishlist} />
-      <Route path="/live-calendar" component={LiveStreamCalendar} />
       <Route path="/live-stream/:id" component={LiveStreamDetail} />
       <Route path="/referral" component={ReferralProgram} />
       <Route path="/loyalty" component={LoyaltyProgram} />
