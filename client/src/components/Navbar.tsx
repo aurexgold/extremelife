@@ -1,16 +1,18 @@
 import { Link, useLocation } from "wouter";
-import { ShoppingCart, Menu, Search, Leaf, Heart } from "lucide-react";
+import { ShoppingCart, Menu, Search, Leaf, Heart, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { wishlist } = useWishlist();
   const { getCartCount } = useCart();
+  const { user, logout } = useAuth();
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -52,6 +54,43 @@ export default function Navbar() {
                       {link.name}
                     </Link>
                   ))}
+                </div>
+                <div className="pt-4 border-t space-y-2">
+                  {user ? (
+                    <>
+                      <Link href="/profile" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full gap-2 rounded-full">
+                          <User className="h-4 w-4" />
+                          My Profile
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        className="w-full gap-2 justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => {
+                          logout();
+                          setIsMenuOpen(false);
+                          setLocation("/");
+                        }}
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Logout
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full rounded-full">
+                          Sign In
+                        </Button>
+                      </Link>
+                      <Link href="/register" onClick={() => setIsMenuOpen(false)}>
+                        <Button className="w-full rounded-full">
+                          Create Account
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </SheetContent>
@@ -113,6 +152,42 @@ export default function Navbar() {
               <span className="sr-only">Cart</span>
             </Button>
           </Link>
+
+          {/* Auth Buttons */}
+          {user ? (
+            <div className="flex items-center gap-2">
+              <Link href="/profile">
+                <Button variant="outline" size="sm" className="gap-2 rounded-full hidden sm:flex">
+                  <User className="h-4 w-4" />
+                  {user.name.split(" ")[0]}
+                </Button>
+              </Link>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  logout();
+                  setLocation("/");
+                }}
+                title="Logout"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </div>
+          ) : (
+            <div className="hidden sm:flex items-center gap-2">
+              <Link href="/login">
+                <Button variant="ghost" size="sm" className="rounded-full">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button size="sm" className="rounded-full">
+                  Register
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </nav>

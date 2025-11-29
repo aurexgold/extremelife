@@ -30,6 +30,7 @@ import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import Profile from "@/pages/Profile";
 import AdminProducts from "@/pages/AdminProducts";
 import AdminOrders from "@/pages/AdminOrders";
 import AdminPromotions from "@/pages/AdminPromotions";
@@ -62,6 +63,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/profile" component={Profile} />
       <Route path="/live" component={Live} />
       <Route path="/shop" component={Home} />
       <Route path="/wishlist" component={Wishlist} />
