@@ -18,6 +18,7 @@ import { UserGroupsProvider } from "@/context/UserGroupsContext";
 import { AbandonedCartProvider } from "@/context/AbandonedCartContext";
 import { OrderTrackingProvider } from "@/context/OrderTrackingContext";
 import { EmailNotificationProvider } from "@/context/EmailNotificationContext";
+import { ProductBundleProvider } from "@/context/ProductBundleContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
@@ -51,6 +52,7 @@ import AdminAbandonedCarts from "@/pages/AdminAbandonedCarts";
 import AdminOrderTracking from "@/pages/AdminOrderTracking";
 import OrderTracking from "@/pages/OrderTracking";
 import AdminEmailNotifications from "@/pages/AdminEmailNotifications";
+import AdminProductBundles from "@/pages/AdminProductBundles";
 import CartPreview from "@/components/CartPreview";
 import AbandonedCartBanner from "@/components/AbandonedCartBanner";
 import EmailNotificationBell from "@/components/EmailNotificationBell";
@@ -78,6 +80,7 @@ function Router() {
           <Route path="/admin/abandoned-carts" component={AdminAbandonedCarts} />
           <Route path="/admin/order-tracking" component={AdminOrderTracking} />
           <Route path="/admin/email-notifications" component={AdminEmailNotifications} />
+          <Route path="/admin/product-bundles" component={AdminProductBundles} />
         </>
       )}
 
@@ -138,7 +141,8 @@ function App() {
                     <AbandonedCartProvider>
                       <OrderTrackingProvider>
                         <EmailNotificationProvider>
-                          <UserGroupsProvider>
+                          <ProductBundleProvider>
+                            <UserGroupsProvider>
                         <ReviewsProvider>
                         <WishlistProvider>
                         <AdminProvider>
@@ -149,6 +153,7 @@ function App() {
                       </WishlistProvider>
                     </ReviewsProvider>
                     </UserGroupsProvider>
+                    </ProductBundleProvider>
                     </EmailNotificationProvider>
                     </OrderTrackingProvider>
                     </AbandonedCartProvider>

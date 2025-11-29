@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { LogOut, Package, ShoppingCart, TrendingUp, Users, Video, Trash2, Edit, Plus, AlertCircle, TrendingDown, AlertTriangle, Truck, Mail } from "lucide-react";
+import { LogOut, Package, ShoppingCart, TrendingUp, Users, Video, Trash2, Edit, Plus, AlertCircle, TrendingDown, AlertTriangle, Truck, Mail, Gift } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { products } from "@/lib/data";
 import OrderDetailsModal from "@/components/OrderDetailsModal";
@@ -120,7 +120,7 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="products" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-9">
             <TabsTrigger value="products" className="gap-2">
               <Package className="h-4 w-4" />
               Products
@@ -144,6 +144,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="abandoned" className="gap-2">
               <AlertTriangle className="h-4 w-4" />
               Abandoned
+            </TabsTrigger>
+            <TabsTrigger value="bundles" className="gap-2">
+              <Gift className="h-4 w-4" />
+              Bundles
             </TabsTrigger>
             <TabsTrigger value="email" className="gap-2">
               <Mail className="h-4 w-4" />
@@ -507,6 +511,14 @@ export default function AdminDashboard() {
             <Button onClick={() => navigate("/admin/abandoned-carts")} className="gap-2">
               <AlertTriangle className="h-4 w-4" />
               View Abandoned Carts Dashboard
+            </Button>
+          </TabsContent>
+
+          {/* Product Bundles Tab */}
+          <TabsContent value="bundles">
+            <Button onClick={() => navigate("/admin/product-bundles")} className="gap-2">
+              <Gift className="h-4 w-4" />
+              Manage Product Bundles
             </Button>
           </TabsContent>
 
