@@ -40,6 +40,7 @@ import AdminOrders from "@/pages/AdminOrders";
 import AdminPromotions from "@/pages/AdminPromotions";
 import AdminCustomers from "@/pages/AdminCustomers";
 import AdminLiveStream from "@/pages/AdminLiveStream";
+import CartPreview from "@/components/CartPreview";
 
 function Router() {
   const { isAuthenticated } = useAdmin();
@@ -97,6 +98,7 @@ function AppContent() {
     <>
       {!isAdminRoute && <Navbar />}
       <Router />
+      {!isAdminRoute && <CartPreview />}
       <Toaster />
     </>
   );

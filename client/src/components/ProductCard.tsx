@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Check } from "lucide-react";
+import { ShoppingCart, Check, Eye } from "lucide-react";
 import WishlistButton from "./WishlistButton";
 import ProductRating from "./ProductRating";
+import QuickViewModal from "./QuickViewModal";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 
@@ -29,6 +30,7 @@ interface ProductProps {
 export default function ProductCard({ product }: ProductProps) {
   const { addToCart } = useCart();
   const [isAdded, setIsAdded] = useState(false);
+  const [showQuickView, setShowQuickView] = useState(false);
   
   const discount = product.originalPrice 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -53,9 +55,11 @@ export default function ProductCard({ product }: ProductProps) {
   };
 
   return (
-    <Link href={`/product/${product.id}`}>
-      <a className="block">
-        <Card className="group overflow-hidden border-border/60 bg-card transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+    <>
+      <QuickViewModal product={product} isOpen={showQuickView} onClose={() => setShowQuickView(false)} />
+      <Link href={`/product/${product.id}`}>
+        <a className="block">
+          <Card className="group overflow-hidden border-border/60 bg-card transition-all hover:shadow-lg hover:-translate-y-1 cursor-pointer">
           <div className="relative aspect-square overflow-hidden bg-muted">
             <img
               src={product.image}
@@ -136,6 +140,18 @@ export default function ProductCard({ product }: ProductProps) {
               {isAdded ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
               {product.stock === 0 ? "Out of Stock" : isAdded ? "Added!" : "Add to Cart"}
             </Button>
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                setShowQuickView(true);
+              }}
+              variant="outline"
+              size="icon"
+              className="rounded-full"
+              data-testid="button-quick-view"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
             <div onClick={(e) => e.preventDefault()}>
               <WishlistButton productId={product.id} productName={product.name} size="default" showText={false} />
             </div>
@@ -143,5 +159,6 @@ export default function ProductCard({ product }: ProductProps) {
         </Card>
       </a>
     </Link>
+    </>
   );
 }
