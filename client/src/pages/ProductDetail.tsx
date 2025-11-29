@@ -2,14 +2,15 @@ import { useRoute, Link, useLocation } from "wouter";
 import { products } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewsList from "@/components/ReviewsList";
 import ProductRating from "@/components/ProductRating";
 import WishlistButton from "@/components/WishlistButton";
 import Breadcrumb from "@/components/Breadcrumb";
+import InfoTabs from "@/components/InfoTabs";
+import RelatedProductsTab from "@/components/RelatedProductsTab";
 import { useCart } from "@/context/CartContext";
-import { ArrowLeft, ShoppingCart, Share2, Check, AlertCircle } from "lucide-react";
+import { ShoppingCart, Share2, Check, AlertCircle, MessageSquare, Info, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -203,37 +204,53 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Reviews & Description Tabs */}
-        <Tabs defaultValue="reviews" className="mb-16">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="reviews">Reviews</TabsTrigger>
-            <TabsTrigger value="description">Details</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="reviews" className="space-y-8 mt-8">
-            <ReviewsList productId={product.id} />
-            <ReviewForm productId={product.id} />
-          </TabsContent>
-
-          <TabsContent value="description" className="mt-8">
-            <Card>
-              <CardContent className="p-8">
-                <h3 className="font-bold text-xl mb-4">About This Product</h3>
-                <p className="text-foreground leading-relaxed mb-6">{product.description}</p>
-                <div className="bg-muted/30 p-6 rounded-lg">
-                  <h4 className="font-bold mb-3">Why Choose This Product?</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li>✓ 100% Organic & Lab Tested</li>
-                    <li>✓ Ethically Sourced from Local Farmers</li>
-                    <li>✓ No Artificial Additives or Preservatives</li>
-                    <li>✓ Trusted by 1000+ Happy Customers</li>
-                    <li>✓ Satisfaction Guaranteed</li>
-                  </ul>
+        {/* Info Tabs - Consolidated */}
+        <InfoTabs
+          defaultValue="reviews"
+          tabs={[
+            {
+              label: "Reviews",
+              value: "reviews",
+              icon: <MessageSquare className="h-4 w-4" />,
+              content: (
+                <div className="space-y-8">
+                  <ReviewsList productId={product.id} />
+                  <ReviewForm productId={product.id} />
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              ),
+            },
+            {
+              label: "Details",
+              value: "details",
+              icon: <Info className="h-4 w-4" />,
+              content: (
+                <Card>
+                  <CardContent className="p-8">
+                    <h3 className="font-bold text-xl mb-4">About This Product</h3>
+                    <p className="text-foreground leading-relaxed mb-6">{product.description}</p>
+                    <div className="bg-muted/30 p-6 rounded-lg">
+                      <h4 className="font-bold mb-3">Why Choose This Product?</h4>
+                      <ul className="space-y-2 text-sm">
+                        <li>✓ 100% Organic & Lab Tested</li>
+                        <li>✓ Ethically Sourced from Local Farmers</li>
+                        <li>✓ No Artificial Additives or Preservatives</li>
+                        <li>✓ Trusted by 1000+ Happy Customers</li>
+                        <li>✓ Satisfaction Guaranteed</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              ),
+            },
+            {
+              label: "Related",
+              value: "related",
+              icon: <Zap className="h-4 w-4" />,
+              content: <RelatedProductsTab currentProductId={product.id} category={product.category} />,
+            },
+          ]}
+          className="mb-16"
+        />
       </div>
     </div>
   );

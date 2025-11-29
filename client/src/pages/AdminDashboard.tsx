@@ -80,9 +80,18 @@ export default function AdminDashboard() {
         {/* Tabs */}
         <Tabs defaultValue="products" className="space-y-4">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="live">Live Stream</TabsTrigger>
+            <TabsTrigger value="products" className="gap-2">
+              <Package className="h-4 w-4" />
+              Products
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="gap-2">
+              <ShoppingCart className="h-4 w-4" />
+              Orders
+            </TabsTrigger>
+            <TabsTrigger value="live" className="gap-2">
+              <Video className="h-4 w-4" />
+              Live Stream
+            </TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
