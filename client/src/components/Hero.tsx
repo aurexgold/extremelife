@@ -14,10 +14,10 @@ export default function Hero() {
               Live Selling Now Active
             </div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl xl:text-6xl mb-6">
-              Nature's Best Kept <span className="text-primary italic">Secrets</span>
+              Natural Wellness para sa <span className="text-primary italic">Pamilya</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto lg:mx-0">
-              Discover our premium collection of organic herbal products, ethically sourced and crafted for your holistic wellness journey.
+              Premium organic herbal products sourced locally at crafted para sa Filipino wellness. Available na sa Shopee at Lazada with fast nationwide delivery.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link href="/shop">

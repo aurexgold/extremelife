@@ -13,7 +13,7 @@ export default function ProductGrid() {
               <span className="text-foreground">Best Selling</span> <span className="italic text-primary">Essentials</span>
             </h2>
             <p className="text-muted-foreground max-w-xl">
-              Hand-picked favorites loved by our community for their purity and effectiveness.
+              Best-sellers at favorites ng aming customers. Available sa Shopee at Lazada with fast nationwide delivery.
             </p>
           </div>
           <Button variant="ghost" className="gap-2 text-primary hover:text-primary/80">
