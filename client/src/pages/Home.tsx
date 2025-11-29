@@ -1,5 +1,7 @@
 import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
+import SearchBar from "@/components/SearchBar";
+import FilterPanel from "@/components/FilterPanel";
 import { Leaf, ShieldCheck, Truck, Award, MapPin, Phone } from "lucide-react";
 import { companyInfo, shippingOptions, paymentMethods } from "@/lib/data";
 
@@ -44,10 +46,25 @@ export default function Home() {
         </div>
       </section>
 
-      <ProductGrid />
+      {/* Search & Filter Section */}
+      <section className="py-8 bg-background border-b">
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="flex justify-center mb-8">
+            <SearchBar />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div>
+              <FilterPanel />
+            </div>
+            <div className="lg:col-span-3">
+              <ProductGrid />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Local Platforms Section */}
-      <section className="py-16 bg-secondary/10">
+      <section className="py-16 bg-background border-t">
         <div className="container mx-auto px-4 md:px-8">
           <h2 className="text-3xl font-bold font-serif mb-4 text-center">Available sa Popular Platforms</h2>
           <p className="text-center text-muted-foreground mb-12">Shop with your preferred local e-commerce platform</p>

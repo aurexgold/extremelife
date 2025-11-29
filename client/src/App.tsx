@@ -11,6 +11,7 @@ import { ReferralProvider } from "@/context/ReferralContext";
 import { LoyaltyProvider } from "@/context/LoyaltyContext";
 import { CartProvider } from "@/context/CartContext";
 import { UserProvider } from "@/context/UserContext";
+import { FilterProvider } from "@/context/FilterContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
@@ -88,25 +89,27 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <UserProvider>
-        <CartProvider>
-          <LoyaltyProvider>
-            <ReferralProvider>
-              <LiveStreamProvider>
-                <ReviewsProvider>
-                  <WishlistProvider>
-                    <AdminProvider>
-                      <TooltipProvider>
-                        <AppContent />
-                      </TooltipProvider>
-                    </AdminProvider>
-                  </WishlistProvider>
-                </ReviewsProvider>
-              </LiveStreamProvider>
-            </ReferralProvider>
-          </LoyaltyProvider>
-        </CartProvider>
-      </UserProvider>
+      <FilterProvider>
+        <UserProvider>
+          <CartProvider>
+            <LoyaltyProvider>
+              <ReferralProvider>
+                <LiveStreamProvider>
+                  <ReviewsProvider>
+                    <WishlistProvider>
+                      <AdminProvider>
+                        <TooltipProvider>
+                          <AppContent />
+                        </TooltipProvider>
+                      </AdminProvider>
+                    </WishlistProvider>
+                  </ReviewsProvider>
+                </LiveStreamProvider>
+              </ReferralProvider>
+            </LoyaltyProvider>
+          </CartProvider>
+        </UserProvider>
+      </FilterProvider>
     </QueryClientProvider>
   );
 }
