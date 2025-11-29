@@ -5,9 +5,15 @@ export interface AuthUser {
   name: string;
   email: string;
   phone: string;
+  role: "customer" | "streamer" | "admin";
   loyaltyTier: "bronze" | "silver" | "gold" | "platinum";
   loyaltyPoints: number;
   createdAt: string;
+  streamerStats?: {
+    totalEarnings: number;
+    totalSales: number;
+    commissionRate: number;
+  };
 }
 
 interface AuthContextType {
@@ -29,9 +35,28 @@ const MOCK_USERS: Record<string, { password: string; user: AuthUser }> = {
       name: "Maria Santos",
       email: "maria@email.com",
       phone: "09123456789",
+      role: "customer",
       loyaltyTier: "gold",
       loyaltyPoints: 2340,
       createdAt: "2024-06-15",
+    },
+  },
+  "sarah.streamer@email.com": {
+    password: "demo2024",
+    user: {
+      id: "streamer001",
+      name: "Sarah Wellness Expert",
+      email: "sarah.streamer@email.com",
+      phone: "09198765432",
+      role: "streamer",
+      loyaltyTier: "platinum",
+      loyaltyPoints: 5000,
+      createdAt: "2024-01-15",
+      streamerStats: {
+        totalEarnings: 28500,
+        totalSales: 285000,
+        commissionRate: 10,
+      },
     },
   },
 };
@@ -67,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       name,
       email,
       phone,
+      role: "customer",
       loyaltyTier: "bronze",
       loyaltyPoints: 0,
       createdAt: new Date().toISOString().split("T")[0],

@@ -13,6 +13,7 @@ import { LoyaltyProvider } from "@/context/LoyaltyContext";
 import { CartProvider } from "@/context/CartContext";
 import { UserProvider } from "@/context/UserContext";
 import { FilterProvider } from "@/context/FilterContext";
+import { StreamerProvider } from "@/context/StreamerContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
@@ -40,6 +41,7 @@ import AdminOrders from "@/pages/AdminOrders";
 import AdminPromotions from "@/pages/AdminPromotions";
 import AdminCustomers from "@/pages/AdminCustomers";
 import AdminLiveStream from "@/pages/AdminLiveStream";
+import StreamerDashboard from "@/pages/StreamerDashboard";
 import CartPreview from "@/components/CartPreview";
 
 function Router() {
@@ -84,6 +86,7 @@ function Router() {
       <Route path="/orders" component={(props: any) => <ProtectedRoute component={OrderHistory} {...props} />} />
       <Route path="/order/:id" component={(props: any) => <ProtectedRoute component={OrderDetail} {...props} />} />
       <Route path="/product/:id" component={ProductDetail} />
+      <Route path="/streamer-dashboard" component={(props: any) => <ProtectedRoute component={StreamerDashboard} {...props} />} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -113,15 +116,17 @@ function App() {
             <LoyaltyProvider>
               <ReferralProvider>
                 <LiveStreamProvider>
-                  <ReviewsProvider>
-                    <WishlistProvider>
-                      <AdminProvider>
-                        <TooltipProvider>
-                          <AppContent />
-                        </TooltipProvider>
-                      </AdminProvider>
-                    </WishlistProvider>
-                  </ReviewsProvider>
+                  <StreamerProvider>
+                    <ReviewsProvider>
+                      <WishlistProvider>
+                        <AdminProvider>
+                          <TooltipProvider>
+                            <AppContent />
+                          </TooltipProvider>
+                        </AdminProvider>
+                      </WishlistProvider>
+                    </ReviewsProvider>
+                  </StreamerProvider>
                 </LiveStreamProvider>
               </ReferralProvider>
             </LoyaltyProvider>
