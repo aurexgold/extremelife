@@ -31,6 +31,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Profile from "@/pages/Profile";
+import OrderDetail from "@/pages/OrderDetail";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminProducts from "@/pages/AdminProducts";
 import AdminOrders from "@/pages/AdminOrders";
@@ -77,6 +78,7 @@ function Router() {
       <Route path="/profile" component={(props: any) => <ProtectedRoute component={Profile} {...props} />} />
       <Route path="/checkout" component={(props: any) => <ProtectedRoute component={Checkout} {...props} />} />
       <Route path="/orders" component={(props: any) => <ProtectedRoute component={OrderHistory} {...props} />} />
+      <Route path="/order/:id" component={(props: any) => <ProtectedRoute component={OrderDetail} {...props} />} />
       <Route path="/product/:id" component={ProductDetail} />
       <Route component={NotFound} />
     </Switch>

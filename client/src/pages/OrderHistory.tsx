@@ -1,10 +1,29 @@
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Package, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Package, Calendar, ArrowRight } from "lucide-react";
 
 export default function OrderHistory() {
   const { orders } = useCart();
+  const { user } = useAuth();
+  const [, setLocation] = useLocation();
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background py-12">
+        <div className="container mx-auto px-4 max-w-md text-center">
+          <h1 className="text-2xl font-bold mb-4">Please Log In</h1>
+          <p className="text-muted-foreground mb-6">You need to be logged in to view your orders.</p>
+          <Button onClick={() => setLocation("/login")} className="rounded-full">
+            Go to Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (orders.length === 0) {
     return (
@@ -12,6 +31,11 @@ export default function OrderHistory() {
         <div className="container mx-auto px-4 md:px-8">
           <h1 className="text-4xl font-bold font-serif text-foreground mb-2">Order History</h1>
           <p className="text-muted-foreground mb-8">No orders yet</p>
+          <Link href="/shop">
+            <Button className="rounded-full">
+              Start Shopping
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -25,9 +49,9 @@ export default function OrderHistory() {
 
         <div className="space-y-4">
           {orders.map((order) => (
-            <Card key={order.id} className="overflow-hidden">
+            <Card key={order.id} className="overflow-hidden hover:shadow-lg transition cursor-pointer">
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 pb-4 border-b">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 pb-4 border-b">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Order ID</p>
                     <p className="font-bold text-lg">{order.id}</p>
@@ -39,12 +63,18 @@ export default function OrderHistory() {
                     </p>
                   </div>
                   <div>
+                    <p className="text-sm text-muted-foreground mb-1">Status</p>
+                    <Badge className="bg-green-100 text-green-800 border-0">
+                      {order.status === "completed" ? "Delivered" : order.status}
+                    </Badge>
+                  </div>
+                  <div>
                     <p className="text-sm text-muted-foreground mb-1">Shipping</p>
-                    <p className="font-semibold">{order.shippingMethod}</p>
+                    <p className="font-semibold text-sm">{order.shippingMethod}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Payment</p>
-                    <p className="font-semibold">{order.paymentMethod}</p>
+                    <p className="font-semibold text-sm">{order.paymentMethod}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground mb-1">Total</p>
@@ -52,6 +82,17 @@ export default function OrderHistory() {
                       ₱{order.total.toLocaleString()}
                     </p>
                   </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground">
+                    {order.items.length} item{order.items.length !== 1 ? "s" : ""}
+                  </div>
+                  <button
+                    onClick={() => setLocation(`/order/${order.id}`)}
+                    className="inline-flex items-center gap-2 text-primary hover:underline font-semibold"
+                  >
+                    View Details <ArrowRight className="h-4 w-4" />
+                  </button>
                 </div>
 
                 <div className="mb-4 pb-4 border-b">
