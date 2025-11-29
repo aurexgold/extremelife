@@ -16,6 +16,7 @@ import { FilterProvider } from "@/context/FilterContext";
 import { StreamerProvider } from "@/context/StreamerContext";
 import { UserGroupsProvider } from "@/context/UserGroupsContext";
 import { AbandonedCartProvider } from "@/context/AbandonedCartContext";
+import { OrderTrackingProvider } from "@/context/OrderTrackingContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
@@ -46,6 +47,8 @@ import AdminLiveStream from "@/pages/AdminLiveStream";
 import StreamerDashboard from "@/pages/StreamerDashboard";
 import AdminUserGroups from "@/pages/AdminUserGroups";
 import AdminAbandonedCarts from "@/pages/AdminAbandonedCarts";
+import AdminOrderTracking from "@/pages/AdminOrderTracking";
+import OrderTracking from "@/pages/OrderTracking";
 import CartPreview from "@/components/CartPreview";
 import AbandonedCartBanner from "@/components/AbandonedCartBanner";
 
@@ -70,6 +73,7 @@ function Router() {
           <Route path="/admin/promotions" component={AdminPromotions} />
           <Route path="/admin/user-groups" component={AdminUserGroups} />
           <Route path="/admin/abandoned-carts" component={AdminAbandonedCarts} />
+          <Route path="/admin/order-tracking" component={AdminOrderTracking} />
         </>
       )}
 
@@ -86,6 +90,8 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/faq" component={FAQ} />
       <Route path="/cart" component={Cart} />
+      <Route path="/tracking" component={OrderTracking} />
+      <Route path="/tracking/:id" component={OrderTracking} />
 
       {/* Protected Routes (Login Required) */}
       <Route path="/profile" component={(props: any) => <ProtectedRoute component={Profile} {...props} />} />
@@ -126,7 +132,8 @@ function App() {
                 <LiveStreamProvider>
                   <StreamerProvider>
                     <AbandonedCartProvider>
-                      <UserGroupsProvider>
+                      <OrderTrackingProvider>
+                        <UserGroupsProvider>
                         <ReviewsProvider>
                         <WishlistProvider>
                         <AdminProvider>
@@ -137,6 +144,7 @@ function App() {
                       </WishlistProvider>
                     </ReviewsProvider>
                     </UserGroupsProvider>
+                    </OrderTrackingProvider>
                     </AbandonedCartProvider>
                   </StreamerProvider>
                 </LiveStreamProvider>
