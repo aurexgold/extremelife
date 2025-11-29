@@ -4,10 +4,12 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AdminProvider, useAdmin } from "@/context/AdminContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
 import Live from "@/pages/Live";
+import Wishlist from "@/pages/Wishlist";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminProducts from "@/pages/AdminProducts";
@@ -42,6 +44,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/live" component={Live} />
       <Route path="/shop" component={Home} />
+      <Route path="/wishlist" component={Wishlist} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -49,8 +52,6 @@ function Router() {
 
 function AppContent() {
   const { isAuthenticated } = useAdmin();
-
-  // Don't show navbar on admin pages
   const isAdminRoute = window.location.pathname.startsWith("/admin");
 
   return (
@@ -65,11 +66,13 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AdminProvider>
-        <TooltipProvider>
-          <AppContent />
-        </TooltipProvider>
-      </AdminProvider>
+      <WishlistProvider>
+        <AdminProvider>
+          <TooltipProvider>
+            <AppContent />
+          </TooltipProvider>
+        </AdminProvider>
+      </WishlistProvider>
     </QueryClientProvider>
   );
 }

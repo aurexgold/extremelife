@@ -1,6 +1,7 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Star, Badge } from "lucide-react";
+import WishlistButton from "./WishlistButton";
 
 interface ProductProps {
   product: {
@@ -88,11 +89,12 @@ export default function ProductCard({ product }: ProductProps) {
           )}
         </div>
       </CardContent>
-      <CardFooter className="p-5 pt-0">
-        <Button className="w-full rounded-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors" variant="outline">
+      <CardFooter className="p-5 pt-0 gap-2">
+        <Button className="flex-1 rounded-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors" variant="outline">
           <ShoppingCart className="h-4 w-4" />
           Add to Cart
         </Button>
+        <WishlistButton productId={product.id} productName={product.name} size="default" showText={false} />
       </CardFooter>
     </Card>
   );

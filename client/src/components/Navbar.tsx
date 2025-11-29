@@ -1,12 +1,14 @@
 import { Link, useLocation } from "wouter";
-import { ShoppingCart, Menu, Search, Leaf } from "lucide-react";
+import { ShoppingCart, Menu, Search, Leaf, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import { useWishlist } from "@/context/WishlistContext";
 
 export default function Navbar() {
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { wishlist } = useWishlist();
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -85,6 +87,17 @@ export default function Navbar() {
             <Search className="h-5 w-5" />
             <span className="sr-only">Search</span>
           </Button>
+          <Link href="/wishlist">
+            <Button variant="ghost" size="icon" className="relative hover:text-red-500">
+              <Heart className="h-5 w-5" />
+              {wishlist.length > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {wishlist.length}
+                </span>
+              )}
+              <span className="sr-only">Wishlist</span>
+            </Button>
+          </Link>
           <Button variant="outline" size="icon" className="relative border-primary/20 hover:bg-primary/5 hover:text-primary">
             <ShoppingCart className="h-5 w-5" />
             <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
