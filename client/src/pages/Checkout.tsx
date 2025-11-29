@@ -1,17 +1,22 @@
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
+import { useUser } from "@/context/UserContext";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { validateCheckoutForm, getFieldError, ValidationError } from "@/lib/validation";
+import { SHIPPING_OPTIONS, PAYMENT_OPTIONS, TAX_RATE, FREE_SHIPPING_THRESHOLD, LOYALTY_DISCOUNTS } from "@/lib/constants";
 
 export default function Checkout() {
   const { cart, getCartTotal, placeOrder } = useCart();
+  const { currentUser, getLoyaltyDiscount } = useUser();
   const [, setLocation] = useLocation();
   const [step, setStep] = useState<"info" | "shipping" | "payment" | "confirmation">("info");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -29,37 +34,42 @@ export default function Checkout() {
   const [order, setOrder] = useState<any>(null);
 
   const subtotal = getCartTotal();
-  const tax = Math.round(subtotal * 0.13);
-  const shippingFee = selectedShipping === "lalamove" ? 200 : 75;
-  const total = subtotal + tax + shippingFee;
-
-  const shippingOptions = [
-    { id: "jnt", name: "J&T Express", fee: 75, days: "2-3 days" },
-    { id: "lbc", name: "LBC Express", fee: 75, days: "3-5 days" },
-    { id: "2go", name: "2GO Express", fee: 75, days: "2-4 days" },
-    { id: "lalamove", name: "Lalamove (Metro Manila)", fee: 200, days: "Same day" },
-  ];
-
-  const paymentOptions = [
-    { id: "gcash", name: "GCash", logo: "💳", description: "Mobile wallet" },
-    { id: "paymaya", name: "PayMaya", logo: "💳", description: "Debit/prepaid card" },
-    { id: "cod", name: "Cash on Delivery", logo: "💵", description: "Pay when delivered" },
-  ];
+  const loyaltyDiscount = getLoyaltyDiscount();
+  const discountAmount = Math.round(subtotal * loyaltyDiscount);
+  const subtotalAfterDiscount = subtotal - discountAmount;
+  const tax = Math.round(subtotalAfterDiscount * TAX_RATE);
+  
+  const shippingOption = SHIPPING_OPTIONS.find(s => s.id === selectedShipping);
+  const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : (shippingOption?.fee || 75);
+  const total = subtotalAfterDiscount + tax + shippingFee;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Clear error for this field when user starts typing
+    setValidationErrors((prev) => prev.filter((err) => err.field !== name));
+  };
+
+  const handleNext = () => {
+    if (step === "info") {
+      const errors = validateCheckoutForm(formData);
+      if (errors.length > 0) {
+        setValidationErrors(errors);
+        toast.error(`Please fix ${errors.length} validation error(s)`);
+        return;
+      }
+    }
+    setStep(step === "info" ? "shipping" : step === "shipping" ? "payment" : "confirmation");
   };
 
   const handlePlaceOrder = async () => {
-    if (!formData.name || !formData.email || !formData.address) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
     setIsProcessing(true);
     // Simulate payment processing
     await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    const shippingName = SHIPPING_OPTIONS.find((s) => s.id === selectedShipping)?.name || "J&T Express";
+    const paymentName = PAYMENT_OPTIONS.find((p) => p.id === selectedPayment)?.name || "GCash";
 
     const newOrder = placeOrder({
       items: cart,
@@ -70,12 +80,19 @@ export default function Checkout() {
       customerName: formData.name,
       customerEmail: formData.email,
       shippingAddress: `${formData.address}, ${formData.barangay}, ${formData.city}, ${formData.province} ${formData.postalCode}`,
-      shippingMethod: shippingOptions.find((s) => s.id === selectedShipping)?.name || "J&T Express",
-      paymentMethod: paymentOptions.find((p) => p.id === selectedPayment)?.name || "GCash",
+      shippingMethod: shippingName,
+      paymentMethod: paymentName,
       status: "completed",
     });
 
-    setOrder(newOrder);
+    // Apply loyalty discount to order
+    const orderWithDiscount = {
+      ...newOrder,
+      loyaltyDiscount: discountAmount,
+      loyaltyTier: currentUser?.loyaltyTier || "bronze",
+    };
+
+    setOrder(orderWithDiscount);
     setIsProcessing(false);
     setStep("confirmation");
   };
@@ -139,13 +156,19 @@ export default function Checkout() {
                   <span>Subtotal</span>
                   <span>₱{order.subtotal.toLocaleString()}</span>
                 </div>
+                {order.loyaltyDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600 font-semibold">
+                    <span>Loyalty Discount ({order.loyaltyTier})</span>
+                    <span>-₱{order.loyaltyDiscount.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span>Tax (13%)</span>
                   <span>₱{order.tax.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Shipping ({order.shippingMethod})</span>
-                  <span>₱{order.shipping.toLocaleString()}</span>
+                  <span>{order.shipping === 0 ? "Free" : `₱${order.shipping}`}</span>
                 </div>
               </div>
 
@@ -199,15 +222,20 @@ export default function Checkout() {
         <h1 className="text-4xl font-bold font-serif text-foreground mb-8">Checkout</h1>
 
         {/* Progress Steps */}
-        <div className="flex gap-4 mb-8">
-          {["info", "shipping", "payment"].map((s, idx) => (
-            <div
-              key={s}
-              className={`flex-1 h-1 rounded-full ${
-                step === s ? "bg-primary" : idx < ["info", "shipping", "payment"].indexOf(step) ? "bg-green-500" : "bg-muted"
-              }`}
-            />
-          ))}
+        <div className="flex gap-2 mb-8">
+          {["info", "shipping", "payment"].map((s, idx) => {
+            const steps = ["info", "shipping", "payment"];
+            const isActive = step === s;
+            const isCompleted = steps.indexOf(s) < steps.indexOf(step);
+            return (
+              <div
+                key={s}
+                className={`flex-1 h-1 rounded-full ${
+                  isActive ? "bg-primary" : isCompleted ? "bg-green-500" : "bg-muted"
+                }`}
+              />
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -220,86 +248,173 @@ export default function Checkout() {
                   <CardDescription>Enter your details for delivery</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  {/* Full Name */}
+                  <div>
+                    <label className="block text-sm font-bold mb-1">Full Name *</label>
                     <input
                       type="text"
                       name="name"
-                      placeholder="Full Name *"
+                      placeholder="Juan Dela Cruz"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="col-span-2 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                        getFieldError("name", validationErrors)
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-input focus:ring-primary"
+                      }`}
                     />
+                    {getFieldError("name", validationErrors) && (
+                      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getFieldError("name", validationErrors)}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-bold mb-1">Email *</label>
                     <input
                       type="email"
                       name="email"
-                      placeholder="Email *"
+                      placeholder="juan@email.com"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="col-span-2 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                        getFieldError("email", validationErrors)
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-input focus:ring-primary"
+                      }`}
                     />
+                    {getFieldError("email", validationErrors) && (
+                      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getFieldError("email", validationErrors)}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Phone */}
+                  <div>
+                    <label className="block text-sm font-bold mb-1">Phone Number * (10 digits)</label>
                     <input
                       type="tel"
                       name="phone"
-                      placeholder="Phone Number"
+                      placeholder="09123456789"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="col-span-2 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                        getFieldError("phone", validationErrors)
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-input focus:ring-primary"
+                      }`}
                     />
+                    {getFieldError("phone", validationErrors) && (
+                      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {getFieldError("phone", validationErrors)}
+                      </p>
+                    )}
                   </div>
 
                   <div className="pt-4 border-t">
                     <h3 className="font-bold mb-4">Shipping Address</h3>
-                    <div className="space-y-4">
+
+                    {/* Street Address */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-bold mb-1">Street Address *</label>
                       <input
                         type="text"
                         name="address"
-                        placeholder="Street Address *"
+                        placeholder="123 Main St"
                         value={formData.address}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                          getFieldError("address", validationErrors)
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-input focus:ring-primary"
+                        }`}
                       />
+                      {getFieldError("address", validationErrors) && (
+                        <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3" />
+                          {getFieldError("address", validationErrors)}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Barangay */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-bold mb-1">Barangay</label>
                       <input
                         type="text"
                         name="barangay"
-                        placeholder="Barangay"
+                        placeholder="Barangay name"
                         value={formData.barangay}
                         onChange={handleInputChange}
                         className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                       />
-                      <div className="grid grid-cols-2 gap-4">
+                    </div>
+
+                    {/* City & Province */}
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-bold mb-1">City *</label>
                         <input
                           type="text"
                           name="city"
-                          placeholder="City *"
+                          placeholder="Manila"
                           value={formData.city}
                           onChange={handleInputChange}
-                          className="px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                            getFieldError("city", validationErrors)
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-input focus:ring-primary"
+                          }`}
                         />
+                        {getFieldError("city", validationErrors) && (
+                          <p className="text-xs text-red-600 mt-1">
+                            {getFieldError("city", validationErrors)}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold mb-1">Province</label>
                         <input
                           type="text"
                           name="province"
-                          placeholder="Province"
+                          placeholder="NCR"
                           value={formData.province}
                           onChange={handleInputChange}
-                          className="px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                         />
                       </div>
+                    </div>
+
+                    {/* Postal Code */}
+                    <div>
+                      <label className="block text-sm font-bold mb-1">Postal Code (4 digits)</label>
                       <input
                         type="text"
                         name="postalCode"
-                        placeholder="Postal Code"
+                        placeholder="1000"
                         value={formData.postalCode}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                          getFieldError("postalCode", validationErrors)
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-input focus:ring-primary"
+                        }`}
                       />
+                      {getFieldError("postalCode", validationErrors) && (
+                        <p className="text-xs text-red-600 mt-1">
+                          {getFieldError("postalCode", validationErrors)}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <Button
-                    onClick={() => setStep("shipping")}
-                    className="w-full rounded-full h-12 mt-6"
-                    size="lg"
-                  >
+                  <Button onClick={handleNext} className="w-full rounded-full h-12 mt-6" size="lg">
                     Continue to Shipping
                   </Button>
                 </CardContent>
@@ -313,7 +428,7 @@ export default function Checkout() {
                   <CardDescription>Choose your preferred delivery option</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {shippingOptions.map((option) => (
+                  {SHIPPING_OPTIONS.map((option) => (
                     <div
                       key={option.id}
                       onClick={() => setSelectedShipping(option.id as any)}
@@ -328,30 +443,24 @@ export default function Checkout() {
                           <h4 className="font-bold mb-1">{option.name}</h4>
                           <p className="text-sm text-muted-foreground">{option.days}</p>
                         </div>
-                        <span className="font-bold">₱{option.fee}</span>
+                        <span className="font-bold">{subtotal >= FREE_SHIPPING_THRESHOLD && option.id !== "lalamove" ? "Free" : `₱${option.fee}`}</span>
                       </div>
                     </div>
                   ))}
 
-                  <div className="pt-4 border-t bg-secondary/5 p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      Free shipping on orders over ₱2,500 (Standard methods only)
-                    </p>
-                  </div>
+                  {subtotal >= FREE_SHIPPING_THRESHOLD && (
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                      <p className="text-sm text-green-800">
+                        ✓ Free shipping unlocked! Orders over ₱{FREE_SHIPPING_THRESHOLD.toLocaleString()} qualify for free standard shipping.
+                      </p>
+                    </div>
+                  )}
 
-                  <div className="flex gap-3 mt-6">
-                    <Button
-                      onClick={() => setStep("info")}
-                      variant="outline"
-                      className="flex-1 rounded-full"
-                    >
+                  <div className="flex gap-3 pt-6">
+                    <Button onClick={() => setStep("info")} variant="outline" className="flex-1 rounded-full">
                       Back
                     </Button>
-                    <Button
-                      onClick={() => setStep("payment")}
-                      className="flex-1 rounded-full h-12"
-                      size="lg"
-                    >
+                    <Button onClick={handleNext} className="flex-1 rounded-full h-12" size="lg">
                       Continue to Payment
                     </Button>
                   </div>
@@ -366,7 +475,7 @@ export default function Checkout() {
                   <CardDescription>Choose how you'd like to pay</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {paymentOptions.map((option) => (
+                  {PAYMENT_OPTIONS.map((option) => (
                     <div
                       key={option.id}
                       onClick={() => setSelectedPayment(option.id as any)}
@@ -385,17 +494,11 @@ export default function Checkout() {
                   ))}
 
                   <div className="pt-4 border-t bg-secondary/5 p-4 rounded-lg">
-                    <p className="text-sm">
-                      ✓ Your payment information is secure and encrypted
-                    </p>
+                    <p className="text-sm">✓ Your payment information is secure and encrypted</p>
                   </div>
 
-                  <div className="flex gap-3 mt-6">
-                    <Button
-                      onClick={() => setStep("shipping")}
-                      variant="outline"
-                      className="flex-1 rounded-full"
-                    >
+                  <div className="flex gap-3 pt-6">
+                    <Button onClick={() => setStep("shipping")} variant="outline" className="flex-1 rounded-full">
                       Back
                     </Button>
                     <Button
@@ -431,32 +534,45 @@ export default function Checkout() {
                   ))}
                 </div>
 
-                <div className="space-y-2 mb-4 pb-4 border-b">
-                  <div className="flex justify-between text-sm">
+                <div className="space-y-2 mb-4 pb-4 border-b text-sm">
+                  <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
                     <span>₱{subtotal.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+
+                  {loyaltyDiscount > 0 && (
+                    <div className="flex justify-between text-green-600 font-semibold">
+                      <span>Loyalty Discount ({currentUser?.loyaltyTier})</span>
+                      <span>-₱{discountAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between">
                     <span className="text-muted-foreground">Tax (13%)</span>
                     <span>₱{tax.toLocaleString()}</span>
                   </div>
+
                   {step !== "info" && (
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between">
                       <span className="text-muted-foreground">Shipping</span>
-                      <span>₱{shippingFee}</span>
+                      <span>{shippingFee === 0 ? "Free" : `₱${shippingFee}`}</span>
                     </div>
                   )}
                 </div>
 
                 <div className="flex justify-between font-bold text-lg mb-6">
                   <span>Total</span>
-                  <span className="text-primary">
-                    ₱{step === "info" ? (subtotal + tax).toLocaleString() : (subtotal + tax + shippingFee).toLocaleString()}
-                  </span>
+                  <span className="text-primary">₱{total.toLocaleString()}</span>
                 </div>
 
+                {loyaltyDiscount > 0 && (
+                  <Badge className="w-full justify-center py-2 mb-4 bg-green-100 text-green-800 border-0">
+                    {currentUser?.loyaltyTier?.toUpperCase()} Member: {Math.round(loyaltyDiscount * 100)}% off
+                  </Badge>
+                )}
+
                 {step === "payment" && (
-                  <Badge className="w-full text-center justify-center py-2 bg-green-100 text-green-800 border-0">
+                  <Badge className="w-full text-center justify-center py-2 bg-primary text-primary-foreground border-0">
                     Ready to place order
                   </Badge>
                 )}
