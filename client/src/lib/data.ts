@@ -22,7 +22,10 @@ export const products = [
     description: "A soothing blend of dandelion, milk thistle, and ginger to support natural detoxification.",
     shopee: true,
     lazada: true,
-    fcf: true
+    fcf: true,
+    stock: 45,
+    rating: 4.8,
+    reviews: 127
   },
   {
     id: 2,
@@ -34,7 +37,10 @@ export const products = [
     description: "100% pure therapeutic grade lavender oil for relaxation and sleep support.",
     shopee: true,
     lazada: true,
-    fcf: true
+    fcf: true,
+    stock: 8,
+    rating: 4.9,
+    reviews: 243
   },
   {
     id: 3,
@@ -46,7 +52,10 @@ export const products = [
     description: "Boost your immune system with our potent blend of Vitamin C, Zinc, and Elderberry.",
     shopee: true,
     lazada: true,
-    fcf: true
+    fcf: true,
+    stock: 32,
+    rating: 4.7,
+    reviews: 89
   },
   {
     id: 4,
@@ -58,7 +67,10 @@ export const products = [
     description: "Gentle exfoliation with ground oats and honey for soft, glowing skin.",
     shopee: true,
     lazada: true,
-    fcf: true
+    fcf: true,
+    stock: 0,
+    rating: 4.6,
+    reviews: 156
   },
   {
     id: 5,
@@ -70,7 +82,10 @@ export const products = [
     description: "Calming chamomile and valerian root blend to help you drift off naturally.",
     shopee: true,
     lazada: true,
-    fcf: false
+    fcf: false,
+    stock: 23,
+    rating: 4.9,
+    reviews: 198
   },
   {
     id: 6,
@@ -82,7 +97,10 @@ export const products = [
     description: "Sharpen your mind with peppermint, rosemary, and lemon essential oils.",
     shopee: true,
     lazada: true,
-    fcf: true
+    fcf: true,
+    stock: 15,
+    rating: 4.8,
+    reviews: 67
   }
 ];
 

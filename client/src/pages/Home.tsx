@@ -2,6 +2,7 @@ import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
 import SearchBar from "@/components/SearchBar";
 import FilterPanel from "@/components/FilterPanel";
+import RecentlyViewed from "@/components/RecentlyViewed";
 import { Leaf, ShieldCheck, Truck, Award, MapPin, Phone } from "lucide-react";
 import { companyInfo, shippingOptions, paymentMethods } from "@/lib/data";
 
@@ -45,6 +46,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Recently Viewed */}
+      <RecentlyViewed />
 
       {/* Search & Filter Section */}
       <section className="py-8 bg-background border-b">

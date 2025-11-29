@@ -1,4 +1,4 @@
-import { useRoute, Link } from "wouter";
+import { useRoute, Link, useLocation } from "wouter";
 import { products } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,14 +7,29 @@ import ReviewForm from "@/components/ReviewForm";
 import ReviewsList from "@/components/ReviewsList";
 import ProductRating from "@/components/ProductRating";
 import WishlistButton from "@/components/WishlistButton";
-import { ArrowLeft, ShoppingCart, Share2, Check } from "lucide-react";
-import { useState } from "react";
+import Breadcrumb from "@/components/Breadcrumb";
+import { useCart } from "@/context/CartContext";
+import { ArrowLeft, ShoppingCart, Share2, Check, AlertCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function ProductDetail() {
   const [match, params] = useRoute("/product/:id");
+  const [, setLocation] = useLocation();
+  const { addToCart } = useCart();
   const [isAdded, setIsAdded] = useState(false);
   const productId = params?.id ? parseInt(params.id) : null;
   const product = productId ? products.find((p) => p.id === productId) : null;
+
+  // Track recently viewed
+  useEffect(() => {
+    if (product) {
+      const viewed = localStorage.getItem("recentlyViewed");
+      const ids = viewed ? JSON.parse(viewed) : [];
+      const filtered = ids.filter((id: number) => id !== product.id);
+      localStorage.setItem("recentlyViewed", JSON.stringify([product.id, ...filtered]));
+    }
+  }, [product?.id]);
 
   if (!match || !product) {
     return (
@@ -30,20 +45,34 @@ export default function ProductDetail() {
   }
 
   const handleAddToCart = () => {
+    if (product.stock === 0) {
+      toast.error("This product is out of stock");
+      return;
+    }
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1,
+    });
     setIsAdded(true);
+    toast.success(`${product.name} added to cart!`);
     setTimeout(() => setIsAdded(false), 2000);
   };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 md:px-8 py-8">
-        {/* Header */}
-        <Link href="/">
-          <a className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Shop
-          </a>
-        </Link>
+        {/* Breadcrumb */}
+        <Breadcrumb 
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Shop", href: "/shop" },
+            { label: product.category, href: "/shop" }
+          ]}
+          current={product.name}
+        />
 
         {/* Product Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
@@ -89,6 +118,38 @@ export default function ProductDetail() {
             {/* Description */}
             <p className="text-foreground mb-8 leading-relaxed">{product.description}</p>
 
+            {/* Stock Status */}
+            {product.stock !== undefined && (
+              <div className={`mb-8 px-4 py-3 rounded-lg flex items-center gap-2 ${
+                product.stock === 0
+                  ? "bg-red-50 border border-red-200"
+                  : product.stock < 10
+                    ? "bg-orange-50 border border-orange-200"
+                    : "bg-green-50 border border-green-200"
+              }`}>
+                <AlertCircle className={`h-5 w-5 ${
+                  product.stock === 0
+                    ? "text-red-600"
+                    : product.stock < 10
+                      ? "text-orange-600"
+                      : "text-green-600"
+                }`} />
+                <span className={`font-semibold ${
+                  product.stock === 0
+                    ? "text-red-800"
+                    : product.stock < 10
+                      ? "text-orange-800"
+                      : "text-green-800"
+                }`}>
+                  {product.stock === 0
+                    ? "Out of Stock"
+                    : product.stock < 10
+                      ? `Only ${product.stock} items left in stock`
+                      : "In Stock"}
+                </span>
+              </div>
+            )}
+
             {/* Platforms */}
             <div className="flex gap-2 mb-8 flex-wrap">
               {product.shopee && (
@@ -109,9 +170,10 @@ export default function ProductDetail() {
                 size="lg"
                 className="flex-1 rounded-full gap-2 h-12"
                 onClick={handleAddToCart}
+                disabled={product.stock === 0}
               >
-                <ShoppingCart className="h-5 w-5" />
-                {isAdded ? "Added!" : "Add to Cart"}
+                {isAdded ? <Check className="h-5 w-5" /> : <ShoppingCart className="h-5 w-5" />}
+                {product.stock === 0 ? "Out of Stock" : isAdded ? "Added!" : "Add to Cart"}
               </Button>
               <WishlistButton productId={product.id} productName={product.name} variant="outline" size="lg" />
               <Button variant="outline" size="lg" className="rounded-full">

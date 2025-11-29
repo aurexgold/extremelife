@@ -20,6 +20,9 @@ interface ProductProps {
     shopee?: boolean;
     lazada?: boolean;
     fcf?: boolean;
+    stock?: number;
+    rating?: number;
+    reviews?: number;
   };
 }
 
@@ -33,6 +36,10 @@ export default function ProductCard({ product }: ProductProps) {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (product.stock === 0) {
+      toast.error("This product is out of stock");
+      return;
+    }
     addToCart({
       productId: product.id,
       name: product.name,
@@ -61,6 +68,17 @@ export default function ProductCard({ product }: ProductProps) {
             {discount > 0 && (
               <div className="absolute top-3 left-3 rounded bg-red-600 text-white px-2 py-1 text-xs font-bold shadow-sm">
                 -{discount}%
+              </div>
+            )}
+            {product.stock !== undefined && (
+              <div className={`absolute bottom-3 left-3 rounded px-2 py-1 text-xs font-bold shadow-sm ${
+                product.stock === 0 
+                  ? "bg-red-600 text-white" 
+                  : product.stock < 10 
+                    ? "bg-orange-600 text-white" 
+                    : "bg-green-600 text-white"
+              }`}>
+                {product.stock === 0 ? "Out of Stock" : product.stock < 10 ? `Only ${product.stock} left` : "In Stock"}
               </div>
             )}
           </div>
@@ -111,11 +129,12 @@ export default function ProductCard({ product }: ProductProps) {
           <CardFooter className="p-5 pt-0 gap-2">
             <Button 
               onClick={handleAddToCart}
+              disabled={product.stock === 0}
               className="flex-1 rounded-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors" 
               variant={isAdded ? "default" : "outline"}
             >
               {isAdded ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
-              {isAdded ? "Added!" : "Add to Cart"}
+              {product.stock === 0 ? "Out of Stock" : isAdded ? "Added!" : "Add to Cart"}
             </Button>
             <div onClick={(e) => e.preventDefault()}>
               <WishlistButton productId={product.id} productName={product.name} size="default" showText={false} />
