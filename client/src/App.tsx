@@ -7,6 +7,7 @@ import { AdminProvider, useAdmin } from "@/context/AdminContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { ReviewsProvider } from "@/context/ReviewsContext";
 import { LiveStreamProvider } from "@/context/LiveStreamContext";
+import { ReferralProvider } from "@/context/ReferralContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
@@ -15,6 +16,7 @@ import Wishlist from "@/pages/Wishlist";
 import ProductDetail from "@/pages/ProductDetail";
 import LiveStreamCalendar from "@/pages/LiveStreamCalendar";
 import LiveStreamDetail from "@/pages/LiveStreamDetail";
+import ReferralProgram from "@/pages/ReferralProgram";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminProducts from "@/pages/AdminProducts";
@@ -52,6 +54,7 @@ function Router() {
       <Route path="/wishlist" component={Wishlist} />
       <Route path="/live-calendar" component={LiveStreamCalendar} />
       <Route path="/live-stream/:id" component={LiveStreamDetail} />
+      <Route path="/referral" component={ReferralProgram} />
       <Route path="/product/:id" component={ProductDetail} />
       <Route component={NotFound} />
     </Switch>
@@ -74,17 +77,19 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <LiveStreamProvider>
-        <ReviewsProvider>
-          <WishlistProvider>
-            <AdminProvider>
-              <TooltipProvider>
-                <AppContent />
-              </TooltipProvider>
-            </AdminProvider>
-          </WishlistProvider>
-        </ReviewsProvider>
-      </LiveStreamProvider>
+      <ReferralProvider>
+        <LiveStreamProvider>
+          <ReviewsProvider>
+            <WishlistProvider>
+              <AdminProvider>
+                <TooltipProvider>
+                  <AppContent />
+                </TooltipProvider>
+              </AdminProvider>
+            </WishlistProvider>
+          </ReviewsProvider>
+        </LiveStreamProvider>
+      </ReferralProvider>
     </QueryClientProvider>
   );
 }
