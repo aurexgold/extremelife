@@ -6,6 +6,7 @@ import ReviewForm from "@/components/ReviewForm";
 import ReviewsList from "@/components/ReviewsList";
 import ProductRating from "@/components/ProductRating";
 import ProductReviewsSection from "@/components/ProductReviewsSection";
+import EnhancedReviewForm from "@/components/EnhancedReviewForm";
 import WishlistButton from "@/components/WishlistButton";
 import Breadcrumb from "@/components/Breadcrumb";
 import InfoTabs from "@/components/InfoTabs";
@@ -216,7 +217,7 @@ export default function ProductDetail() {
               content: (
                 <div className="space-y-8">
                   <ProductReviewsSection productId={product.id} />
-                  <ReviewForm productId={product.id} />
+                  <EnhancedReviewForm productId={product.id} />
                 </div>
               ),
             },

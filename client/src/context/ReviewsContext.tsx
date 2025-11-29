@@ -10,15 +10,22 @@ export interface Review {
   comment: string;
   date: string;
   helpful: number;
+  images?: string[];
+  isApproved?: boolean;
+  isFlagged?: boolean;
 }
 
 interface ReviewsContextType {
   reviews: Review[];
-  addReview: (review: Omit<Review, "id" | "date">) => void;
+  addReview: (review: Omit<Review, "id" | "date" | "isApproved" | "isFlagged">) => void;
   getProductReviews: (productId: number) => Review[];
   getAverageRating: (productId: number) => number;
   getReviewCount: (productId: number) => number;
   markHelpful: (reviewId: string) => void;
+  approveReview: (reviewId: string) => void;
+  rejectReview: (reviewId: string) => void;
+  deleteReview: (reviewId: string) => void;
+  getAllReviews: () => Review[];
 }
 
 export const ReviewsContext = createContext<ReviewsContextType | undefined>(undefined);
@@ -34,6 +41,8 @@ const MOCK_REVIEWS: Review[] = [
     comment: "This tea really helped me feel energized. Great quality and fast shipping!",
     date: "2024-11-25",
     helpful: 12,
+    isApproved: true,
+    isFlagged: false,
   },
   {
     id: "2",
@@ -45,6 +54,8 @@ const MOCK_REVIEWS: Review[] = [
     comment: "Tastes good and I noticed positive effects after 2 weeks. Would recommend!",
     date: "2024-11-20",
     helpful: 8,
+    isApproved: true,
+    isFlagged: false,
   },
   {
     id: "3",
@@ -56,6 +67,8 @@ const MOCK_REVIEWS: Review[] = [
     comment: "Pure quality. I use it every night and sleep so much better. Worth every peso!",
     date: "2024-11-18",
     helpful: 15,
+    isApproved: true,
+    isFlagged: false,
   },
   {
     id: "4",
@@ -67,6 +80,8 @@ const MOCK_REVIEWS: Review[] = [
     comment: "I've been taking this for a month and I feel healthier. Highly recommended.",
     date: "2024-11-15",
     helpful: 10,
+    isApproved: true,
+    isFlagged: false,
   },
 ];
 
@@ -79,11 +94,13 @@ export function ReviewsProvider({ children }: { children: ReactNode }) {
     return MOCK_REVIEWS;
   });
 
-  const addReview = (newReview: Omit<Review, "id" | "date">) => {
+  const addReview = (newReview: Omit<Review, "id" | "date" | "isApproved" | "isFlagged">) => {
     const review: Review = {
       ...newReview,
       id: Date.now().toString(),
       date: new Date().toISOString().split("T")[0],
+      isApproved: false,
+      isFlagged: false,
     };
     const updated = [review, ...reviews];
     setReviews(updated);
@@ -91,7 +108,11 @@ export function ReviewsProvider({ children }: { children: ReactNode }) {
   };
 
   const getProductReviews = (productId: number) => {
-    return reviews.filter((r) => r.productId === productId);
+    return reviews.filter((r) => r.productId === productId && r.isApproved);
+  };
+
+  const getAllReviews = () => {
+    return reviews;
   };
 
   const getAverageRating = (productId: number) => {
@@ -109,6 +130,26 @@ export function ReviewsProvider({ children }: { children: ReactNode }) {
     setReviews((prev) =>
       prev.map((r) => (r.id === reviewId ? { ...r, helpful: r.helpful + 1 } : r))
     );
+    localStorage.setItem("reviews", JSON.stringify(reviews));
+  };
+
+  const approveReview = (reviewId: string) => {
+    setReviews((prev) =>
+      prev.map((r) => (r.id === reviewId ? { ...r, isApproved: true, isFlagged: false } : r))
+    );
+    localStorage.setItem("reviews", JSON.stringify(reviews));
+  };
+
+  const rejectReview = (reviewId: string) => {
+    setReviews((prev) =>
+      prev.map((r) => (r.id === reviewId ? { ...r, isApproved: false } : r))
+    );
+    localStorage.setItem("reviews", JSON.stringify(reviews));
+  };
+
+  const deleteReview = (reviewId: string) => {
+    setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+    localStorage.setItem("reviews", JSON.stringify(reviews));
   };
 
   return (
@@ -120,6 +161,10 @@ export function ReviewsProvider({ children }: { children: ReactNode }) {
         getAverageRating,
         getReviewCount,
         markHelpful,
+        approveReview,
+        rejectReview,
+        deleteReview,
+        getAllReviews,
       }}
     >
       {children}

@@ -53,6 +53,7 @@ import AdminOrderTracking from "@/pages/AdminOrderTracking";
 import OrderTracking from "@/pages/OrderTracking";
 import AdminEmailNotifications from "@/pages/AdminEmailNotifications";
 import AdminProductBundles from "@/pages/AdminProductBundles";
+import AdminReviews from "@/pages/AdminReviews";
 import CartPreview from "@/components/CartPreview";
 import AbandonedCartBanner from "@/components/AbandonedCartBanner";
 import EmailNotificationBell from "@/components/EmailNotificationBell";
@@ -81,6 +82,7 @@ function Router() {
           <Route path="/admin/order-tracking" component={AdminOrderTracking} />
           <Route path="/admin/email-notifications" component={AdminEmailNotifications} />
           <Route path="/admin/product-bundles" component={AdminProductBundles} />
+          <Route path="/admin/reviews" component={AdminReviews} />
         </>
       )}
 

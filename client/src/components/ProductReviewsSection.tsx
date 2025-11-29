@@ -1,7 +1,7 @@
 import { useReviews } from "@/context/ReviewsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import EnhancedReviewCard from "@/components/EnhancedReviewCard";
+import EnhancedReviewCardWithPhotos from "@/components/EnhancedReviewCardWithPhotos";
 import StarRating from "@/components/StarRating";
 import { MessageSquare, Filter } from "lucide-react";
 import { useState } from "react";
@@ -119,7 +119,7 @@ export default function ProductReviewsSection({ productId }: ProductReviewsSecti
         ) : (
           <div className="space-y-3">
             {filteredReviews.map(review => (
-              <EnhancedReviewCard
+              <EnhancedReviewCardWithPhotos
                 key={review.id}
                 review={review}
                 isVerified={true}
