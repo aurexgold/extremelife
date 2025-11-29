@@ -1,10 +1,10 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { ChevronLeft, ChevronRight, Calendar, Play, User } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "wouter";
 import LiveStreamPlayer from "@/components/LiveStreamPlayer";
 import LiveChat from "@/components/LiveChat";
 import ProductCard from "@/components/ProductCard";
@@ -13,6 +13,7 @@ import { useLiveStreams } from "@/context/LiveStreamContext";
 
 export default function Live() {
   const { streams } = useLiveStreams();
+  const [, setLocation] = useLocation();
   const [currentDate, setCurrentDate] = useState(new Date(2024, 10, 29));
   
   // Get featured products for the live stream
@@ -203,11 +204,13 @@ export default function Live() {
                               {hasStreams && (
                                 <div className="mt-1 space-y-0.5">
                                   {streamsOnDay.slice(0, 2).map((stream) => (
-                                    <Link key={stream.id} href={`/live-stream/${stream.id}`}>
-                                      <div className="text-xs bg-primary/10 text-primary px-1 py-0.5 rounded truncate cursor-pointer hover:bg-primary/20">
-                                        {stream.title}
-                                      </div>
-                                    </Link>
+                                    <div 
+                                      key={stream.id}
+                                      onClick={() => setLocation(`/live-stream/${stream.id}`)}
+                                      className="text-xs bg-primary/10 text-primary px-1 py-0.5 rounded truncate cursor-pointer hover:bg-primary/20"
+                                    >
+                                      {stream.title}
+                                    </div>
                                   ))}
                                   {streamsOnDay.length > 2 && (
                                     <p className="text-xs text-muted-foreground px-1">+{streamsOnDay.length - 2} more</p>
@@ -228,20 +231,22 @@ export default function Live() {
             <div className="space-y-4">
               <h3 className="font-bold text-lg">Upcoming Events</h3>
               {streams.slice(0, 4).map((stream) => (
-                <Link key={stream.id} href={`/live-stream/${stream.id}`}>
-                  <Card className="cursor-pointer hover:shadow-md transition overflow-hidden">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">{stream.title}</CardTitle>
-                      <CardDescription className="text-xs">{stream.date} at {stream.time}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <User className="h-3 w-3" />
-                        {stream.host}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                <Card 
+                  key={stream.id}
+                  onClick={() => setLocation(`/live-stream/${stream.id}`)}
+                  className="cursor-pointer hover:shadow-md transition overflow-hidden"
+                >
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm">{stream.title}</CardTitle>
+                    <CardDescription className="text-xs">{stream.date} at {stream.time}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <User className="h-3 w-3" />
+                      {stream.host}
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
