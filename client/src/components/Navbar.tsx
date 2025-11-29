@@ -87,6 +87,7 @@ export default function Navbar() {
                           setIsMenuOpen(false);
                           setLocation("/");
                         }}
+                        data-testid="button-logout-mobile"
                       >
                         <LogOut className="h-4 w-4" />
                         Logout
@@ -196,6 +197,8 @@ export default function Navbar() {
                   setLocation("/");
                 }}
                 title="Logout"
+                data-testid="button-logout-desktop"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
                 <LogOut className="h-5 w-5" />
               </Button>
