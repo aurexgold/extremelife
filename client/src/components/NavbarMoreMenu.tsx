@@ -1,9 +1,17 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 
 export default function NavbarMoreMenu() {
+  const [, setLocation] = useLocation();
+
+  const menuItems = [
+    { label: "Referral Program", href: "/referral" },
+    { label: "FAQ", href: "/faq" },
+    { label: "Contact Us", href: "/contact" },
+  ];
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -12,21 +20,15 @@ export default function NavbarMoreMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <Link href="/referral">
-          <DropdownMenuItem className="cursor-pointer">
-            Referral Program
+        {menuItems.map((item) => (
+          <DropdownMenuItem
+            key={item.href}
+            className="cursor-pointer"
+            onClick={() => setLocation(item.href)}
+          >
+            {item.label}
           </DropdownMenuItem>
-        </Link>
-        <Link href="/faq">
-          <DropdownMenuItem className="cursor-pointer">
-            FAQ
-          </DropdownMenuItem>
-        </Link>
-        <Link href="/contact">
-          <DropdownMenuItem className="cursor-pointer">
-            Contact Us
-          </DropdownMenuItem>
-        </Link>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
