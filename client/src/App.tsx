@@ -17,6 +17,7 @@ import { StreamerProvider } from "@/context/StreamerContext";
 import { UserGroupsProvider } from "@/context/UserGroupsContext";
 import { AbandonedCartProvider } from "@/context/AbandonedCartContext";
 import { OrderTrackingProvider } from "@/context/OrderTrackingContext";
+import { EmailNotificationProvider } from "@/context/EmailNotificationContext";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
@@ -49,8 +50,10 @@ import AdminUserGroups from "@/pages/AdminUserGroups";
 import AdminAbandonedCarts from "@/pages/AdminAbandonedCarts";
 import AdminOrderTracking from "@/pages/AdminOrderTracking";
 import OrderTracking from "@/pages/OrderTracking";
+import AdminEmailNotifications from "@/pages/AdminEmailNotifications";
 import CartPreview from "@/components/CartPreview";
 import AbandonedCartBanner from "@/components/AbandonedCartBanner";
+import EmailNotificationBell from "@/components/EmailNotificationBell";
 
 function Router() {
   const { isAuthenticated } = useAdmin();
@@ -74,6 +77,7 @@ function Router() {
           <Route path="/admin/user-groups" component={AdminUserGroups} />
           <Route path="/admin/abandoned-carts" component={AdminAbandonedCarts} />
           <Route path="/admin/order-tracking" component={AdminOrderTracking} />
+          <Route path="/admin/email-notifications" component={AdminEmailNotifications} />
         </>
       )}
 
@@ -133,7 +137,8 @@ function App() {
                   <StreamerProvider>
                     <AbandonedCartProvider>
                       <OrderTrackingProvider>
-                        <UserGroupsProvider>
+                        <EmailNotificationProvider>
+                          <UserGroupsProvider>
                         <ReviewsProvider>
                         <WishlistProvider>
                         <AdminProvider>
@@ -144,6 +149,7 @@ function App() {
                       </WishlistProvider>
                     </ReviewsProvider>
                     </UserGroupsProvider>
+                    </EmailNotificationProvider>
                     </OrderTrackingProvider>
                     </AbandonedCartProvider>
                   </StreamerProvider>

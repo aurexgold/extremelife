@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { LogOut, Package, ShoppingCart, TrendingUp, Users, Video, Trash2, Edit, Plus, AlertCircle, TrendingDown, AlertTriangle, Truck } from "lucide-react";
+import { LogOut, Package, ShoppingCart, TrendingUp, Users, Video, Trash2, Edit, Plus, AlertCircle, TrendingDown, AlertTriangle, Truck, Mail } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { products } from "@/lib/data";
 import OrderDetailsModal from "@/components/OrderDetailsModal";
+import EmailNotificationBell from "@/components/EmailNotificationBell";
 
 export default function AdminDashboard() {
   const [, navigate] = useLocation();
@@ -80,14 +81,17 @@ export default function AdminDashboard() {
             <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
             <p className="text-sm text-muted-foreground">Welcome, {adminName}</p>
           </div>
-          <Button
-            variant="outline"
-            className="gap-2"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-2">
+            <EmailNotificationBell />
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -116,7 +120,7 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="products" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="products" className="gap-2">
               <Package className="h-4 w-4" />
               Products
@@ -140,6 +144,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="abandoned" className="gap-2">
               <AlertTriangle className="h-4 w-4" />
               Abandoned
+            </TabsTrigger>
+            <TabsTrigger value="email" className="gap-2">
+              <Mail className="h-4 w-4" />
+              Email
             </TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
@@ -499,6 +507,14 @@ export default function AdminDashboard() {
             <Button onClick={() => navigate("/admin/abandoned-carts")} className="gap-2">
               <AlertTriangle className="h-4 w-4" />
               View Abandoned Carts Dashboard
+            </Button>
+          </TabsContent>
+
+          {/* Email Notifications Tab */}
+          <TabsContent value="email">
+            <Button onClick={() => navigate("/admin/email-notifications")} className="gap-2">
+              <Mail className="h-4 w-4" />
+              View Email Notifications
             </Button>
           </TabsContent>
 
