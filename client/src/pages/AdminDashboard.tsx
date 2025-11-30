@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { LogOut, Package, ShoppingCart, TrendingUp, Users, Video, Trash2, Edit, Plus, AlertCircle, TrendingDown, AlertTriangle, Truck, Mail, Gift, MessageSquare } from "lucide-react";
+import { LogOut, Package, ShoppingCart, TrendingUp, Users, Video, Trash2, Edit, Plus, AlertCircle, TrendingDown, AlertTriangle, Truck, Mail, Gift, MessageSquare, Zap, DollarSign, Award, Users2 } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { products } from "@/lib/data";
 import OrderDetailsModal from "@/components/OrderDetailsModal";
@@ -50,6 +50,51 @@ export default function AdminDashboard() {
   ];
 
   const lowStockProducts = productsList.filter(p => p.stock < 10);
+  const criticalStockProducts = productsList.filter(p => p.stock < 5);
+  const outOfStockProducts = productsList.filter(p => p.stock === 0);
+
+  // 1. REVENUE BY TIME PERIOD
+  const revenueByPeriod = {
+    today: 3200,
+    thisWeek: 18400,
+    thisMonth: 95320,
+    ytd: 450000
+  };
+
+  // 2. STREAMER PERFORMANCE DATA
+  const streamers = [
+    { id: 1, name: "Sarah Wellness Expert", sales: 156000, commission: 15600, commissionRate: 10, viewers: 2450, liveHours: 24, rating: 4.8 },
+    { id: 2, name: "Maria Health Coach", sales: 98000, commission: 9800, commissionRate: 10, viewers: 1890, liveHours: 18, rating: 4.6 },
+    { id: 3, name: "Rosa Natural Living", sales: 67000, commission: 6700, commissionRate: 10, viewers: 1200, liveHours: 14, rating: 4.5 },
+  ];
+
+  // 3. PAYMENT METHOD BREAKDOWN
+  const paymentMethods = [
+    { method: "GCash", count: 45, percentage: 42, revenue: 85600 },
+    { method: "PayMaya", count: 32, percentage: 30, revenue: 60800 },
+    { method: "COD", count: 30, percentage: 28, revenue: 56920 },
+  ];
+
+  // 4. LOGISTICS PROVIDER DATA
+  const logisticsData = [
+    { provider: "J&T Express", orders: 38, avgTime: "2.5 days", status: { delivered: 32, transit: 5, pending: 1 }, cost: 2280 },
+    { provider: "LBC Express", orders: 32, avgTime: "3 days", status: { delivered: 28, transit: 3, pending: 1 }, cost: 1920 },
+    { provider: "2GO Express", orders: 24, avgTime: "3.5 days", status: { delivered: 20, transit: 3, pending: 1 }, cost: 1440 },
+    { provider: "Lalamove", orders: 13, avgTime: "1 day", status: { delivered: 12, transit: 1, pending: 0 }, cost: 2600 },
+  ];
+
+  // 5. LOYALTY & REFERRAL IMPACT
+  const loyaltyImpact = {
+    totalPointsIssued: 28900,
+    totalPointsRedeemed: 12340,
+    loyaltyRevenue: 34200,
+    referralRevenue: 18500,
+    topReferrer: { name: "Juan Dela Cruz", referrals: 12, revenue: 4800 }
+  };
+
+  const lowStockAlert = lowStockProducts.length > 0;
+  const criticalStockAlert = criticalStockProducts.length > 0;
+  const outOfStockAlert = outOfStockProducts.length > 0;
 
   const handleLogout = () => {
     logout();
@@ -120,44 +165,52 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="products" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-10">
-            <TabsTrigger value="products" className="gap-2">
+          <TabsList className="grid w-full grid-cols-12 overflow-x-auto">
+            <TabsTrigger value="products" className="gap-1 text-xs md:text-sm">
               <Package className="h-4 w-4" />
-              Products
+              <span className="hidden sm:inline">Products</span>
             </TabsTrigger>
-            <TabsTrigger value="orders" className="gap-2">
+            <TabsTrigger value="orders" className="gap-1 text-xs md:text-sm">
               <ShoppingCart className="h-4 w-4" />
-              Orders
+              <span className="hidden sm:inline">Orders</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Analytics
+            <TabsTrigger value="revenue" className="gap-1 text-xs md:text-sm">
+              <DollarSign className="h-4 w-4" />
+              <span className="hidden sm:inline">Revenue</span>
             </TabsTrigger>
-            <TabsTrigger value="live" className="gap-2">
-              <Video className="h-4 w-4" />
-              Live Stream
+            <TabsTrigger value="streamers" className="gap-1 text-xs md:text-sm">
+              <Zap className="h-4 w-4" />
+              <span className="hidden sm:inline">Streamers</span>
             </TabsTrigger>
-            <TabsTrigger value="tracking" className="gap-2">
+            <TabsTrigger value="payments" className="gap-1 text-xs md:text-sm">
+              <DollarSign className="h-4 w-4" />
+              <span className="hidden sm:inline">Payments</span>
+            </TabsTrigger>
+            <TabsTrigger value="logistics" className="gap-1 text-xs md:text-sm">
               <Truck className="h-4 w-4" />
-              Tracking
+              <span className="hidden sm:inline">Logistics</span>
             </TabsTrigger>
-            <TabsTrigger value="abandoned" className="gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              Abandoned
+            <TabsTrigger value="loyalty" className="gap-1 text-xs md:text-sm">
+              <Award className="h-4 w-4" />
+              <span className="hidden sm:inline">Loyalty</span>
             </TabsTrigger>
-            <TabsTrigger value="bundles" className="gap-2">
-              <Gift className="h-4 w-4" />
-              Bundles
+            <TabsTrigger value="analytics" className="gap-1 text-xs md:text-sm">
+              <TrendingUp className="h-4 w-4" />
+              <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
-            <TabsTrigger value="reviews" className="gap-2">
+            <TabsTrigger value="live" className="gap-1 text-xs md:text-sm">
+              <Video className="h-4 w-4" />
+              <span className="hidden sm:inline">Live</span>
+            </TabsTrigger>
+            <TabsTrigger value="reviews" className="gap-1 text-xs md:text-sm">
               <MessageSquare className="h-4 w-4" />
-              Reviews
+              <span className="hidden sm:inline">Reviews</span>
             </TabsTrigger>
-            <TabsTrigger value="email" className="gap-2">
-              <Mail className="h-4 w-4" />
-              Email
+            <TabsTrigger value="tracking" className="gap-1 text-xs md:text-sm">
+              <AlertTriangle className="h-4 w-4" />
+              <span className="hidden sm:inline">Abandoned</span>
             </TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs md:text-sm">⚙️</TabsTrigger>
           </TabsList>
 
           {/* Products Tab */}
@@ -372,17 +425,288 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
+          {/* IMPROVEMENT 1: Revenue Tab */}
+          <TabsContent value="revenue" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Today's Revenue</p>
+                    <p className="text-3xl font-bold">₱{revenueByPeriod.today.toLocaleString('en-PH')}</p>
+                    <div className="flex items-center gap-1 text-green-600 text-sm">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>+8.2% vs yesterday</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">This Week</p>
+                    <p className="text-3xl font-bold">₱{revenueByPeriod.thisWeek.toLocaleString('en-PH')}</p>
+                    <div className="flex items-center gap-1 text-green-600 text-sm">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>+15.3% vs last week</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">This Month</p>
+                    <p className="text-3xl font-bold">₱{revenueByPeriod.thisMonth.toLocaleString('en-PH')}</p>
+                    <div className="flex items-center gap-1 text-green-600 text-sm">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>+22.5% vs last month</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Year to Date</p>
+                    <p className="text-3xl font-bold">₱{revenueByPeriod.ytd.toLocaleString('en-PH')}</p>
+                    <div className="flex items-center gap-1 text-green-600 text-sm">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>+35% vs last year</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* IMPROVEMENT 2: Streamer Performance Tab */}
+          <TabsContent value="streamers" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Streamer Performers</CardTitle>
+                <CardDescription>Streamer sales, commissions, and engagement metrics</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-3 px-4 font-semibold">Streamer</th>
+                        <th className="text-left py-3 px-4 font-semibold">Total Sales</th>
+                        <th className="text-left py-3 px-4 font-semibold">Commission</th>
+                        <th className="text-left py-3 px-4 font-semibold">Live Hours</th>
+                        <th className="text-left py-3 px-4 font-semibold">Avg Viewers</th>
+                        <th className="text-left py-3 px-4 font-semibold">Rating</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {streamers.map((streamer) => (
+                        <tr key={streamer.id} className="border-b hover:bg-muted/30 transition">
+                          <td className="py-3 px-4 font-medium">{streamer.name}</td>
+                          <td className="py-3 px-4 font-bold">₱{streamer.sales.toLocaleString('en-PH')}</td>
+                          <td className="py-3 px-4 text-green-600 font-semibold">₱{streamer.commission.toLocaleString('en-PH')}</td>
+                          <td className="py-3 px-4">{streamer.liveHours}h</td>
+                          <td className="py-3 px-4">{streamer.viewers.toLocaleString('en-PH')}</td>
+                          <td className="py-3 px-4">
+                            <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">
+                              ⭐ {streamer.rating}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* IMPROVEMENT 3: Payment Methods Tab */}
+          <TabsContent value="payments" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {paymentMethods.map((pm, i) => (
+                <Card key={i}>
+                  <CardContent className="p-6">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="font-semibold">{pm.method}</p>
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold">{pm.percentage}%</span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Orders</p>
+                        <p className="text-2xl font-bold">{pm.count}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Revenue</p>
+                        <p className="text-lg font-bold">₱{pm.revenue.toLocaleString('en-PH')}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment Method Distribution</CardTitle>
+              </CardHeader>
+              <CardContent className="flex justify-center">
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={paymentMethods.map(pm => ({ name: pm.method, value: pm.count }))}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {paymentMethods.map((pm, i) => (
+                        <Cell key={`cell-${i}`} fill={['#3b82f6', '#10b981', '#f59e0b'][i]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* IMPROVEMENT 4: Logistics Tracking Tab */}
+          <TabsContent value="logistics" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Logistics Provider Performance</CardTitle>
+                <CardDescription>Philippine local shipping providers breakdown</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-3 px-4 font-semibold">Provider</th>
+                        <th className="text-left py-3 px-4 font-semibold">Orders</th>
+                        <th className="text-left py-3 px-4 font-semibold">Avg Delivery</th>
+                        <th className="text-left py-3 px-4 font-semibold">Delivered</th>
+                        <th className="text-left py-3 px-4 font-semibold">In Transit</th>
+                        <th className="text-left py-3 px-4 font-semibold">Pending</th>
+                        <th className="text-left py-3 px-4 font-semibold">Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {logisticsData.map((log, i) => (
+                        <tr key={i} className="border-b hover:bg-muted/30 transition">
+                          <td className="py-3 px-4 font-semibold">{log.provider}</td>
+                          <td className="py-3 px-4">{log.orders}</td>
+                          <td className="py-3 px-4">{log.avgTime}</td>
+                          <td className="py-3 px-4"><span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">{log.status.delivered}</span></td>
+                          <td className="py-3 px-4"><span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold">{log.status.transit}</span></td>
+                          <td className="py-3 px-4"><span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold">{log.status.pending}</span></td>
+                          <td className="py-3 px-4 font-bold">₱{log.cost.toLocaleString('en-PH')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* IMPROVEMENT 5: Loyalty & Referral Tab */}
+          <TabsContent value="loyalty" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">Loyalty Points Issued</p>
+                    <p className="text-3xl font-bold">{loyaltyImpact.totalPointsIssued.toLocaleString('en-PH')}</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">Loyalty Points Redeemed</p>
+                    <p className="text-3xl font-bold">{loyaltyImpact.totalPointsRedeemed.toLocaleString('en-PH')}</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">Loyalty Revenue Generated</p>
+                    <p className="text-3xl font-bold">₱{loyaltyImpact.loyaltyRevenue.toLocaleString('en-PH')}</p>
+                    <p className="text-xs text-green-600">+18% from loyalty members</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">Referral Revenue Generated</p>
+                    <p className="text-3xl font-bold">₱{loyaltyImpact.referralRevenue.toLocaleString('en-PH')}</p>
+                    <p className="text-xs text-green-600">+12% new customer acquisition</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Referrer</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">{loyaltyImpact.topReferrer.name}</span>
+                    <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold">{loyaltyImpact.topReferrer.referrals} referrals</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Revenue generated by referrals:</span>
+                    <span className="font-bold">₱{loyaltyImpact.topReferrer.revenue.toLocaleString('en-PH')}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6">
-            {/* Low Stock Alert */}
-            {lowStockProducts.length > 0 && (
-              <Card className="border-red-200 bg-red-50">
+            {/* IMPROVEMENT 6: Enhanced Stock Alerts */}
+            {outOfStockAlert && (
+              <Card className="border-red-300 bg-red-50">
                 <CardContent className="p-4 flex items-start gap-3">
                   <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-red-900">{lowStockProducts.length} Products Running Low on Stock</p>
+                    <p className="font-semibold text-red-900">🚨 {outOfStockProducts.length} OUT OF STOCK</p>
                     <p className="text-sm text-red-800 mt-1">
-                      {lowStockProducts.map(p => p.name).join(", ")} need restocking
+                      {outOfStockProducts.map(p => p.name).join(", ")} - Urgent reorder needed!
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            {criticalStockAlert && (
+              <Card className="border-orange-300 bg-orange-50">
+                <CardContent className="p-4 flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-orange-900">⚠️ {criticalStockProducts.length} Critical Stock Items</p>
+                    <p className="text-sm text-orange-800 mt-1">
+                      {criticalStockProducts.map(p => p.name).join(", ")} - Less than 5 units
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            {lowStockAlert && !criticalStockAlert && (
+              <Card className="border-yellow-200 bg-yellow-50">
+                <CardContent className="p-4 flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-yellow-900">{lowStockProducts.length} Products Running Low on Stock</p>
+                    <p className="text-sm text-yellow-800 mt-1">
+                      {lowStockProducts.map(p => p.name).join(", ")} need restocking soon
                     </p>
                   </div>
                 </CardContent>
