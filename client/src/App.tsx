@@ -54,6 +54,7 @@ import OrderTracking from "@/pages/OrderTracking";
 import AdminEmailNotifications from "@/pages/AdminEmailNotifications";
 import AdminProductBundles from "@/pages/AdminProductBundles";
 import AdminReviews from "@/pages/AdminReviews";
+import TestCredentials from "@/pages/TestCredentials";
 import CartPreview from "@/components/CartPreview";
 import AbandonedCartBanner from "@/components/AbandonedCartBanner";
 import EmailNotificationBell from "@/components/EmailNotificationBell";
@@ -90,6 +91,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/test-credentials" component={TestCredentials} />
       <Route path="/live" component={Live} />
       <Route path="/shop" component={Home} />
       <Route path="/wishlist" component={Wishlist} />

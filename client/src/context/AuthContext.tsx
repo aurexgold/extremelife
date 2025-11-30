@@ -62,6 +62,39 @@ const MOCK_USERS: Record<string, { password: string; user: AuthUser }> = {
       },
     },
   },
+  "john.customer@email.com": {
+    password: "demo2024",
+    user: {
+      id: "user456",
+      name: "John Dela Cruz",
+      email: "john.customer@email.com",
+      phone: "09234567890",
+      role: "customer",
+      loyaltyTier: "silver",
+      loyaltyPoints: 1200,
+      userGroupId: "group2",
+      createdAt: "2024-08-20",
+    },
+  },
+  "rosa.live@email.com": {
+    password: "demo2024",
+    user: {
+      id: "streamer002",
+      name: "Rosa Natural Living",
+      email: "rosa.live@email.com",
+      phone: "09345678901",
+      role: "streamer",
+      loyaltyTier: "platinum",
+      loyaltyPoints: 4500,
+      userGroupId: "group4",
+      createdAt: "2024-03-10",
+      streamerStats: {
+        totalEarnings: 18900,
+        totalSales: 189000,
+        commissionRate: 10,
+      },
+    },
+  },
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
