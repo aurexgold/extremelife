@@ -110,6 +110,42 @@ export default function AdminDashboard() {
     setShowOrderModal(true);
   };
 
+  // NEW: Customer Analytics
+  const customerMetrics = {
+    newCustomers: 23,
+    returningCustomers: 164,
+    repeatRate: 87.7,
+    avgLTV: 8420,
+    churnRate: 2.3,
+    acquisitionCost: 450
+  };
+
+  // NEW: Product Categories Performance
+  const categoryPerformance = [
+    { category: "Essential Oils", revenue: 125400, percentage: 35, units: 542 },
+    { category: "Herbal Teas", revenue: 98200, percentage: 27, units: 1240 },
+    { category: "Soaps & Salts", revenue: 76500, percentage: 21, units: 850 },
+    { category: "Supplements", revenue: 58900, percentage: 16, units: 234 },
+  ];
+
+  // NEW: Regional Sales (Philippines)
+  const regionalSales = [
+    { region: "Metro Manila", sales: 145000, orders: 89, customers: 67, growth: "+12%" },
+    { region: "Cebu", sales: 67800, orders: 42, customers: 31, growth: "+8%" },
+    { region: "Davao", sales: 54200, orders: 35, customers: 26, growth: "+5%" },
+    { region: "Bacolod", sales: 38900, orders: 24, customers: 18, growth: "+3%" },
+    { region: "Cagayan de Oro", sales: 32100, orders: 20, customers: 15, growth: "+2%" },
+  ];
+
+  // NEW: Conversion Funnel
+  const conversionFunnel = [
+    { stage: "Site Visitors", count: 12450, percentage: 100 },
+    { stage: "Product Views", count: 8320, percentage: 67 },
+    { stage: "Add to Cart", count: 2148, percentage: 17 },
+    { stage: "Checkout", count: 1574, percentage: 12.6 },
+    { stage: "Completed Orders", count: 945, percentage: 7.6 },
+  ];
+
   const stats = [
     { label: "Total Products", value: productsList.length, icon: Package, color: "bg-blue-100 text-blue-600" },
     { label: "Active Orders", value: 23, icon: ShoppingCart, color: "bg-green-100 text-green-600" },
@@ -209,6 +245,22 @@ export default function AdminDashboard() {
             <TabsTrigger value="tracking" className="gap-1 text-xs md:text-sm">
               <AlertTriangle className="h-4 w-4" />
               <span className="hidden sm:inline">Abandoned</span>
+            </TabsTrigger>
+            <TabsTrigger value="customers" className="gap-1 text-xs md:text-sm">
+              <Users2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Customers</span>
+            </TabsTrigger>
+            <TabsTrigger value="categories" className="gap-1 text-xs md:text-sm">
+              <Package className="h-4 w-4" />
+              <span className="hidden sm:inline">Categories</span>
+            </TabsTrigger>
+            <TabsTrigger value="regions" className="gap-1 text-xs md:text-sm">
+              📍
+              <span className="hidden sm:inline">Regions</span>
+            </TabsTrigger>
+            <TabsTrigger value="funnel" className="gap-1 text-xs md:text-sm">
+              📊
+              <span className="hidden sm:inline">Funnel</span>
             </TabsTrigger>
             <TabsTrigger value="settings" className="text-xs md:text-sm">⚙️</TabsTrigger>
           </TabsList>
@@ -864,6 +916,242 @@ export default function AdminDashboard() {
               <Mail className="h-4 w-4" />
               View Email Notifications
             </Button>
+          </TabsContent>
+
+          {/* NEW: Customer Analytics Tab */}
+          <TabsContent value="customers" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">New Customers</p>
+                    <p className="text-3xl font-bold">{customerMetrics.newCustomers}</p>
+                    <p className="text-xs text-green-600">This month</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Returning Customers</p>
+                    <p className="text-3xl font-bold">{customerMetrics.returningCustomers}</p>
+                    <p className="text-xs text-blue-600">Active customers</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Repeat Purchase Rate</p>
+                    <p className="text-3xl font-bold">{customerMetrics.repeatRate}%</p>
+                    <p className="text-xs text-purple-600">Very healthy</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Avg Customer LTV</p>
+                    <p className="text-3xl font-bold">₱{customerMetrics.avgLTV.toLocaleString('en-PH')}</p>
+                    <p className="text-xs text-green-600">Lifetime Value</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Churn Rate</p>
+                    <p className="text-3xl font-bold">{customerMetrics.churnRate}%</p>
+                    <p className="text-xs text-green-600">Very low</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Customer Acquisition Cost</p>
+                    <p className="text-3xl font-bold">₱{customerMetrics.acquisitionCost}</p>
+                    <p className="text-xs">Per customer</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* NEW: Product Categories Tab */}
+          <TabsContent value="categories" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Categories Performance</CardTitle>
+                <CardDescription>Revenue and sales by product category</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {categoryPerformance.map((cat, i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold">{cat.category}</span>
+                        <span className="text-sm font-bold">₱{cat.revenue.toLocaleString('en-PH')}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" 
+                          style={{width: `${cat.percentage}%`}}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                        <span>{cat.percentage}% of revenue</span>
+                        <span>{cat.units} units sold</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Category Breakdown Chart</CardTitle>
+              </CardHeader>
+              <CardContent className="flex justify-center">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={categoryPerformance.map(cat => ({ name: cat.category, value: cat.revenue }))}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ₱${(value/1000).toFixed(0)}k`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {categoryPerformance.map((_, i) => (
+                        <Cell key={`cell-${i}`} fill={['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'][i]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* NEW: Regional Sales Tab */}
+          <TabsContent value="regions" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Philippine Regional Sales Performance</CardTitle>
+                <CardDescription>Sales breakdown by region</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-3 px-4 font-semibold">Region</th>
+                        <th className="text-left py-3 px-4 font-semibold">Sales</th>
+                        <th className="text-left py-3 px-4 font-semibold">Orders</th>
+                        <th className="text-left py-3 px-4 font-semibold">Customers</th>
+                        <th className="text-left py-3 px-4 font-semibold">Growth</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {regionalSales.map((region, i) => (
+                        <tr key={i} className="border-b hover:bg-muted/30 transition">
+                          <td className="py-3 px-4 font-semibold">{region.region}</td>
+                          <td className="py-3 px-4 font-bold">₱{region.sales.toLocaleString('en-PH')}</td>
+                          <td className="py-3 px-4">{region.orders}</td>
+                          <td className="py-3 px-4">{region.customers}</td>
+                          <td className="py-3 px-4">
+                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">
+                              {region.growth}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Regional Revenue Distribution</CardTitle>
+              </CardHeader>
+              <CardContent className="flex justify-center">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={regionalSales}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="region" angle={-45} textAnchor="end" height={80} />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="sales" fill="#10b981" name="Sales (₱)" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* NEW: Conversion Funnel Tab */}
+          <TabsContent value="funnel" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Sales Conversion Funnel</CardTitle>
+                <CardDescription>Customer journey from visitor to order</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {conversionFunnel.map((stage, i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-bold">{i + 1}</span>
+                          <span className="font-semibold">{stage.stage}</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">{stage.count.toLocaleString('en-PH')}</p>
+                          <p className="text-xs text-muted-foreground">{stage.percentage}%</p>
+                        </div>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div 
+                          className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-500" 
+                          style={{width: `${stage.percentage}%`}}
+                        ></div>
+                      </div>
+                      {i < conversionFunnel.length - 1 && (
+                        <div className="text-xs text-red-600 mt-1 font-semibold">
+                          ↓ Drop-off: {(conversionFunnel[i].percentage - conversionFunnel[i+1].percentage).toFixed(1)}%
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Overall Conversion Rate</p>
+                    <p className="text-3xl font-bold">7.6%</p>
+                    <p className="text-xs text-green-600">+2.1% from last month</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Avg Order Value</p>
+                    <p className="text-3xl font-bold">₱1,249</p>
+                    <p className="text-xs text-green-600">Up from ₱1,120 last month</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Settings Tab */}
